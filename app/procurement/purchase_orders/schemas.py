@@ -1,0 +1,199 @@
+import uuid
+from datetime import date, datetime
+
+from pydantic import BaseModel, field_validator
+
+
+# --- PO Creation ---
+
+class PoItemCreate(BaseModel):
+    indentItemId: uuid.UUID | None = None
+    productId: uuid.UUID | None = None
+    productName: str
+    quantity: float
+    landedPrice: float
+
+    @field_validator("quantity", "landedPrice")
+    @classmethod
+    def must_be_positive(cls, v):
+        if v <= 0:
+            raise ValueError("Must be greater than 0")
+        return v
+
+
+class PoCreate(BaseModel):
+    indentId: uuid.UUID
+    vendorId: uuid.UUID
+    expectedDeliveryDate: date | None = None
+    items: list[PoItemCreate]
+
+    @field_validator("items")
+    @classmethod
+    def items_not_empty(cls, v):
+        if not v:
+            raise ValueError("PO must have at least one item")
+        return v
+
+
+# --- PO Update (delivery status) ---
+
+class PoUpdateRequest(BaseModel):
+    status: str | None = None
+    deliveryType: str | None = None
+    courierName: str | None = None
+    podNumber: str | None = None
+
+
+# --- GRN ---
+
+class GrnItemCreate(BaseModel):
+    itemId: str
+    itemName: str
+    orderedQuantity: float
+    receivedQuantity: float
+    isAccepted: bool
+
+
+class GrnCreate(BaseModel):
+    predefinedComment: str | None = None
+    comments: str | None = None
+    signedDcUrl: str
+    photoUrls: list[str] = []
+    items: list[GrnItemCreate]
+
+
+# --- PO List Item (spec #9.1 / #10.1) ---
+
+class PoListItem(BaseModel):
+    """Rich PO list item matching the spec for both vendor and PH views."""
+    materialRequestId: str | None     # indent tracking_no
+    siteName: str | None
+    region: str | None
+    poNumber: str
+    poDate: str                       # "YYYY-MM-DD"
+    deliveryType: str | None
+    tat: int | None
+    expectedDeliveryDate: str | None  # "YYYY-MM-DD"
+    status: str
+    courierName: str | None
+    podNumber: str | None
+    dateOfDelivery: str | None        # "YYYY-MM-DD"
+    podImageUrl: str | None
+    signedPodUrl: str | None
+    signedDcUrl: str | None
+    tatStatus: str | None
+    reason: str | None
+
+
+# --- Responses ---
+
+class PoItemResponse(BaseModel):
+    id: uuid.UUID
+    itemId: str
+    productId: uuid.UUID | None
+    productName: str
+    quantity: float
+    landedPrice: float
+    totalAmount: float
+
+    @classmethod
+    def from_orm(cls, obj):
+        return cls(
+            id=obj.id,
+            itemId=obj.item_id,
+            productId=obj.product_id,
+            productName=obj.product_name,
+            quantity=float(obj.quantity),
+            landedPrice=float(obj.landed_price),
+            totalAmount=float(obj.total_amount),
+        )
+
+
+class PoResponse(BaseModel):
+    id: uuid.UUID
+    poNumber: str
+    indentId: uuid.UUID | None
+    vendorId: uuid.UUID | None
+    vendorName: str | None
+    siteId: str
+    poDate: datetime
+    expectedDeliveryDate: datetime | None
+    tat: int | None
+    deliveryType: str | None
+    courierName: str | None
+    podNumber: str | None
+    status: str
+    dateOfDelivery: datetime | None
+    totalValue: float
+    createdAt: datetime
+    items: list[PoItemResponse] = []
+
+    @classmethod
+    def from_orm(cls, obj, items=None, vendor_name=None):
+        return cls(
+            id=obj.id,
+            poNumber=obj.po_number,
+            indentId=obj.indent_id,
+            vendorId=obj.vendor_id,
+            vendorName=vendor_name,
+            siteId=obj.site_id,
+            poDate=obj.po_date,
+            expectedDeliveryDate=obj.expected_delivery_date,
+            tat=obj.tat,
+            deliveryType=obj.delivery_type,
+            courierName=obj.courier_name,
+            podNumber=obj.pod_number,
+            status=obj.status,
+            dateOfDelivery=obj.date_of_delivery,
+            totalValue=float(obj.total_value),
+            createdAt=obj.created_at,
+            items=[PoItemResponse.from_orm(i) for i in (items or [])],
+        )
+
+
+class GrnItemResponse(BaseModel):
+    id: uuid.UUID
+    itemId: str
+    itemName: str
+    orderedQuantity: float
+    receivedQuantity: float
+    isAccepted: bool
+
+    @classmethod
+    def from_orm(cls, obj):
+        return cls(
+            id=obj.id,
+            itemId=obj.item_id,
+            itemName=obj.item_name,
+            orderedQuantity=float(obj.ordered_quantity),
+            receivedQuantity=float(obj.received_quantity),
+            isAccepted=obj.is_accepted,
+        )
+
+
+class GrnResponse(BaseModel):
+    id: uuid.UUID
+    poId: uuid.UUID
+    poNumber: str
+    requestorEmail: str
+    predefinedComment: str | None
+    comments: str | None
+    signedDcUrl: str
+    photoUrls: list[str] = []
+    submittedAt: datetime
+    items: list[GrnItemResponse] = []
+
+    @classmethod
+    def from_orm(cls, obj, items=None, photos=None):
+        return cls(
+            id=obj.id,
+            poId=obj.po_id,
+            poNumber=obj.po_number,
+            requestorEmail=obj.requestor_email,
+            predefinedComment=obj.predefined_comment,
+            comments=obj.comments,
+            signedDcUrl=obj.signed_dc_url,
+            photoUrls=[p.photo_url for p in (photos or [])],
+            submittedAt=obj.submitted_at,
+            items=[GrnItemResponse.from_orm(i) for i in (items or [])],
+        )

@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables — never commit .env (use .env.example as the template)
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Uploads / temp
+uploads/
+/tmp/
+
+# Docker volumes (local dev)
+pgdata/
+redisdata/
+miniodata/
+
+# Logs
+*.log

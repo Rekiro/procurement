@@ -1,0 +1,29 @@
+# Core
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic-settings==2.7.1
+email-validator>=2.0.0
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+psycopg[binary]>=3.2.10
+alembic==1.14.1
+
+# Auth
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.20
+
+# Object Storage
+minio==7.2.12
+
+# Excel
+openpyxl==3.1.5
+
+# PDF
+fpdf2==2.8.2
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx==0.28.1

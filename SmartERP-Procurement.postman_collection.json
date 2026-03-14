@@ -1,0 +1,2415 @@
+{
+  "info": {
+    "name": "SmartERP \u00e2\u20ac\u201d Procurement",
+    "description": "Procurement backend API collection.\n\nSetup:\n  1. Set base_url = http://localhost:8001 (or your port)\n  2. Run 'Login' \u00e2\u20ac\u201d token is auto-saved to {{token}}\n  3. Run requests in order within each folder. Create requests auto-save IDs to collection variables (lastVendorId, lastProductId, etc.) for use in approve/reject requests.\n\nNote: Create Vendor uses email 'admin@smart.com'. If you get 409 (already exists), manually set {{lastVendorCode}} from the DB.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8001"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": "admin@smart.com"
+    },
+    {
+      "key": "password",
+      "value": "admin"
+    },
+    {
+      "key": "lastVendorCode",
+      "value": ""
+    },
+    {
+      "key": "lastProductCode",
+      "value": ""
+    },
+    {
+      "key": "lastPcrId",
+      "value": ""
+    },
+    {
+      "key": "lastEmrId",
+      "value": ""
+    },
+    {
+      "key": "lastTrackingNo",
+      "value": ""
+    },
+    {
+      "key": "lastPoNumber",
+      "value": ""
+    },
+    {
+      "key": "lastSiteId",
+      "value": ""
+    },
+    {
+      "key": "lastInvoiceId",
+      "value": ""
+    },
+    {
+      "key": "lastCashPurchaseId",
+      "value": ""
+    },
+    {
+      "key": "lastMachineryReqId",
+      "value": ""
+    },
+    {
+      "key": "lastMachineryPoNumber",
+      "value": ""
+    },
+    {
+      "key": "lastMachineryInvoiceId",
+      "value": ""
+    },
+    {
+      "key": "lastUniformReqId",
+      "value": ""
+    },
+    {
+      "key": "lastUniformPoNumber",
+      "value": ""
+    },
+    {
+      "key": "lastUniformInvoiceId",
+      "value": ""
+    },
+    {
+      "key": "lastNotificationId",
+      "value": ""
+    },
+    {
+      "key": "lastSiteId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/procurement/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.access_token) {",
+                  "    pm.collectionVariables.set('token', json.results.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vendors",
+      "item": [
+        {
+          "name": "Create Vendor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  var body = pm.response.json();",
+                  "  if (body.results && body.results.vendorCode) {",
+                  "    pm.collectionVariables.set('lastVendorCode', body.results.vendorCode);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/vendors",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorName\": \"Global Tech Innovations\",\n  \"state\": \"Karnataka\",\n  \"emailId\": \"info@globaltech.com\",\n  \"natureOfBusiness\": \"Services\"\n}"
+            },
+            "description": "Creates a new vendor with INVITED status."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vendor Applications",
+      "item": [
+        {
+          "name": "Submit Application (multipart)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.vendorCode) {",
+                  "    pm.collectionVariables.set('lastVendorCode', json.results.vendorCode);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/vendor-applications",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\"name\":\"Global Tech Innovations\",\"nameOfOwner\":\"Anil Kumar\",\"email\":\"info@globaltech.com\",\"designation\":\"CEO\",\"category\":\"Services\",\"typesOfBusiness\":\"Private Limited\",\"addressLine1\":\"123 Tech Park, Silicon Valley Layout\",\"addressLine2\":\"Electronic City, Phase 1\",\"state\":\"Karnataka\",\"district\":\"Bengaluru Urban\",\"city\":\"Bengaluru\",\"pinCode\":\"560100\",\"gstDetails\":[{\"state\":\"Karnataka\",\"gstNumber\":\"29ABCDE1234F1Z5\",\"gstCertificate\":\"gstCert0\"}]}",
+                  "type": "text"
+                },
+                {
+                  "key": "shopAndEstablishmentNo",
+                  "type": "file",
+                  "src": "",
+                  "description": "PDF/JPEG/PNG, max 1MB"
+                },
+                {
+                  "key": "panNo",
+                  "type": "file",
+                  "src": "",
+                  "description": "PDF/JPEG/PNG, max 1MB"
+                },
+                {
+                  "key": "gstCert0",
+                  "type": "file",
+                  "src": "",
+                  "description": "GST certificate for entry 0 — field name must match gstDetails[0].gstCertificate"
+                },
+                {
+                  "key": "aadhaarOrUdyamCopy",
+                  "type": "file",
+                  "src": "",
+                  "description": "PDF/JPEG/PNG, max 1MB"
+                },
+                {
+                  "key": "msmeCertificate",
+                  "type": "file",
+                  "src": "",
+                  "description": "PDF/JPEG/PNG, max 1MB"
+                },
+                {
+                  "key": "cancelledCheque",
+                  "type": "file",
+                  "src": "",
+                  "description": "PDF/JPEG/PNG, max 1MB"
+                },
+                {
+                  "key": "escalationMatrix",
+                  "type": "file",
+                  "src": "",
+                  "description": "PDF/JPEG/PNG, max 1MB"
+                },
+                {
+                  "key": "branchOfficeDetails",
+                  "type": "file",
+                  "src": "",
+                  "description": "PDF/JPEG/PNG, max 1MB"
+                },
+                {
+                  "key": "boardResolution",
+                  "type": "file",
+                  "src": "",
+                  "description": "Required if typesOfBusiness is 'Private Limited' or 'LLP'"
+                }
+              ]
+            },
+            "description": "Multipart/form-data — 'data' field is a JSON string, all other fields are file uploads. Select actual files for each file field before sending."
+          }
+        },
+        {
+          "name": "List Applications (paginated)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/vendor-applications?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "vendor-applications"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "", "disabled": true },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "description": "Returns {pagination, vendors}. Use status/search query params to filter."
+          }
+        },
+        {
+          "name": "Get Application by Vendor ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/vendor-applications/{{lastVendorCode}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "description": "Fetches full application details by vendor UUID."
+          }
+        },
+        {
+          "name": "Approve Application",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/vendor-applications/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorIds\": [\n    \"{{lastVendorCode}}\"\n  ]\n}"
+            },
+            "description": "Bulk approve. vendorIds is an array of UUIDs."
+          }
+        },
+        {
+          "name": "Reject Application",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/vendor-applications/{{lastVendorCode}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Incomplete GST documentation\"\n}"
+            },
+            "description": "Field is 'reason' (not 'rejectionReason') per spec."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.productCode) {",
+                  "    pm.collectionVariables.set('lastProductCode', json.results.productCode);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/products",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorCode\": \"{{lastVendorCode}}\",\n  \"productName\": \"Safety Helmet\",\n  \"category\": \"Safety Equipment\",\n  \"subcategory\": \"Head Protection\",\n  \"price\": 250.00,\n  \"hsnCode\": \"65119010\",\n  \"isTaxExempt\": false,\n  \"gstRate\": 18,\n  \"deliveryDays\": 3,\n  \"deliveryCost\": 50.00,\n  \"uom\": \"PCS\",\n  \"description\": \"ISI marked safety helmet\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/products?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "products"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Approve Product",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/products/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productIds\": [\n    \"{{lastProductCode}}\"\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject Product",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/products/{{lastProductCode}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Price too high compared to market rate\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Product Catalog",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/products/catalog",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "My Products (Vendor)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/vendor/products?vendor_code={{lastVendorCode}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "vendor", "products"],
+              "query": [
+                { "key": "vendor_code", "value": "{{lastVendorCode}}" }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/products/{{lastProductCode}}?vendor_code={{lastVendorCode}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "products", "{{lastProductCode}}"],
+              "query": [
+                { "key": "vendor_code", "value": "{{lastVendorCode}}" }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Bulk Upload Template",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/products/bulk-upload-template",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Bulk Upload Products",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/products/bulk-upload?vendor_code={{lastVendorCode}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "products", "bulk-upload"],
+              "query": [
+                { "key": "vendor_code", "value": "{{lastVendorCode}}" }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/products.xlsx"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Price Change Requests",
+      "item": [
+        {
+          "name": "Submit Price Change Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.id) {",
+                  "    pm.collectionVariables.set('lastPcrId', json.results.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/products/price-change-requests",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"{{lastProductCode}}\",\n  \"vendorCode\": \"{{lastVendorCode}}\",\n  \"newPrice\": 275.00,\n  \"wefDate\": \"2026-04-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Price Change Requests",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/products/price-change-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Approve Price Change",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/products/price-change-requests/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approvalId\": \"{{lastPcrId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject Price Change",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/products/price-change-requests/{{lastPcrId}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"New price exceeds approved market rate\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Margins",
+      "item": [
+        {
+          "name": "Get Margins",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/products/margins",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Export Margins Template",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/products/margins/export-template",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Bulk Upload Margins",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/products/margins/bulk-upload",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/margins.xlsx"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sites",
+      "item": [
+        {
+          "name": "01 \u00e2\u20ac\u201d Site Options (Dropdown)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has sites', () => pm.expect(j.results).to.be.an('array').and.lengthOf.at.least(1));",
+                  "if (j.results.length > 0) pm.collectionVariables.set('lastSiteId', j.results[0].siteId);",
+                  "console.log('Sites count:', j.results.length, '| first:', j.results[0]?.siteName);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/sites/options",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "02 \u00e2\u20ac\u201d User Sites",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has sites', () => pm.expect(j.results).to.be.an('array').and.lengthOf.at.least(1));",
+                  "if (j.results && j.results.length > 0) {",
+                  "    pm.collectionVariables.set('lastSiteId', j.results[0].siteId);",
+                  "}",
+                  "console.log('User sites count:', j.results.length, '| first:', j.results[0]?.siteName, '| saved siteId:', j.results[0]?.siteId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/user-sites",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "03 \u00e2\u20ac\u201d Site Material Catalog",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('Products in catalog:', j.results.length, '| first:', j.results[0]?.productName);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/sites/{{lastSiteId}}/material-catalog",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "04 \u00e2\u20ac\u201d Site Order History (indent-based)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "if (j.results.length > 0) {",
+                  "    pm.test('Has trackingNo', () => pm.expect(j.results[0]).to.have.property('trackingNo'));",
+                  "    pm.test('Has value', () => pm.expect(j.results[0]).to.have.property('value'));",
+                  "}",
+                  "console.log('Order history count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/sites/{{lastSiteId}}/history?month=2026-03",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "sites", "{{lastSiteId}}", "history"],
+              "query": [
+                { "key": "month", "value": "2026-03", "description": "Optional YYYY-MM filter" }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "description": "Returns indent history for a site. Spec #8.6. Fields: siteId, trackingNo, requestDate, siteBudget, value, status, balance. Use real siteId (UUID from user-sites or 'siteA' for test data)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Extra Material Requests",
+      "item": [
+        {
+          "name": "Get EMR Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/extra-material-requests/status?siteId=SITE-001",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "extra-material-requests",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "siteId",
+                  "value": "SITE-001"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Create EMR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.id) {",
+                  "    pm.collectionVariables.set('lastEmrId', json.results.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/extra-material-requests",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"siteId\": \"SITE-001\",\n  \"monthYear\": \"2026-03\",\n  \"reason\": \"Additional PPE required due to new client requirements\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List EMRs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/extra-material-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Approve EMR",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/extra-material-requests/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestId\": \"{{lastEmrId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject EMR",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/extra-material-requests/{{lastEmrId}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Budget constraints for this month\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Indents",
+      "item": [
+        {
+          "name": "Create Indent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.trackingNo) {",
+                  "    pm.collectionVariables.set('lastTrackingNo', json.results.trackingNo);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/indents",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requestorEmail\": \"requestor@example.com\",\n  \"siteId\": \"siteA\",\n  \"forMonth\": \"March 2026\",\n  \"isMonthly\": true,\n  \"category\": \"Regular\",\n  \"items\": [\n    {\n      \"productCode\": \"{{lastProductCode}}\",\n      \"quantity\": 5\n    }\n  ]\n}"
+            },
+            "description": "Items use productCode (looked up from DB for price/name). Category: 'Regular' or 'Extra Material'. Response: {message, trackingNo, status}."
+          }
+        },
+        {
+          "name": "List Indents",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/indents?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "indents"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "PENDING_PH_APPROVAL", "disabled": true }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "My Indents",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/indents/my-indents?requestor_email=requestor@example.com",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "indents", "my-indents"],
+              "query": [
+                { "key": "requestor_email", "value": "requestor@example.com" }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Indent Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/indents/{{lastTrackingNo}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "description": "Path param is trackingNo (e.g. IND/2026/00001). Rich detail response with products, totals."
+          }
+        },
+        {
+          "name": "Update Indent",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/procurement/indents/{{lastTrackingNo}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchGst\": \"27AAAAA0000A1Z5\",\n  \"requestCategory\": \"Chargeable\",\n  \"narration\": \"Updated quantities for monthly restock.\",\n  \"products\": [\n    {\n      \"productCode\": \"{{lastProductCode}}\",\n      \"quantity\": 5\n    }\n  ]\n}"
+            },
+            "description": "PH edits an indent. Only allowed in PENDING_PH/RM_APPROVAL. Body: {branchGst, requestCategory, narration, products[{productCode, quantity}]}. Returns full detail."
+          }
+        },
+        {
+          "name": "Approve Indent (creates POs)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results[0] && json.results[0].poNumbers && json.results[0].poNumbers.length) {",
+                  "    pm.collectionVariables.set('lastPoNumber', json.results[0].poNumbers[0]);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/indents/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"indentIds\": [\"{{lastTrackingNo}}\"]\n}"
+            },
+            "description": "Bulk approve. PH approval auto-creates POs grouped by vendor (status → PO_CREATED). RM approval moves to PENDING_PH_APPROVAL. Response includes poNumbers. Auto-saves first PO number to {{lastPoNumber}}."
+          }
+        },
+        {
+          "name": "Reject Indent",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/indents/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trackingNo\": \"{{lastTrackingNo}}\",\n  \"reason\": \"Items exceed monthly budget allocation\"\n}"
+            },
+            "description": "trackingNo in body (not path) because tracking numbers contain slashes."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Purchase Orders",
+      "item": [
+        {
+          "name": "Create PO (from approved indent)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.poNumber) {",
+                  "    pm.collectionVariables.set('lastPoNumber', json.results.poNumber);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"indentId\": \"{{lastIndentId}}\",\n  \"vendorId\": \"{{lastVendorCode}}\",\n  \"expectedDeliveryDate\": \"2026-04-15\",\n  \"items\": [\n    {\n      \"productName\": \"Safety Helmet\",\n      \"quantity\": 10,\n      \"landedPrice\": 260.00\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "List Purchase Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/purchase-orders?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "purchase-orders"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "description": "Paginated PO list. Response: {pagination, purchaseOrders} with rich fields (materialRequestId, siteName, tatStatus, all URL fields). Search filters by PO number, site name, status, tracking no."
+          }
+        },
+        {
+          "name": "Update Delivery Status",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/procurement/purchase-orders/{{lastPoNumber}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Dispatched\",\n  \"deliveryType\": \"Courier\",\n  \"courierName\": \"BlueDart\",\n  \"podNumber\": \"BD123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit GRN",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/{{lastPoNumber}}/grn",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"signedDcUrl\": \"minio/signed-dc.pdf\",\n  \"predefinedComment\": \"GOOD_CONDITION\",\n  \"photoUrls\": [\"minio/photo1.jpg\"],\n  \"items\": [\n    {\n      \"itemId\": \"item-001\",\n      \"itemName\": \"Safety Helmet\",\n      \"orderedQuantity\": 10,\n      \"receivedQuantity\": 10,\n      \"isAccepted\": true\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Export POs to Excel",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/export",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Submit Invoice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.id) {",
+                  "    pm.collectionVariables.set('lastInvoiceId', json.results.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceNo\": \"VND-INV-2026-001\",\n  \"invoiceType\": \"material\",\n  \"state\": \"Maharashtra\",\n  \"billAmount\": 2600.00,\n  \"billUrl\": \"minio/invoices/vnd-inv-2026-001.pdf\",\n  \"poNumbers\": [\"{{lastPoNumber}}\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "List Invoices",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/invoices",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Approve Invoice",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceId\": \"{{lastInvoiceId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject Invoice",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/{{lastInvoiceId}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Bill amount does not match GRN quantities\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cash Purchases",
+      "item": [
+        {
+          "name": "Create Cash Purchase",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.id) {",
+                  "    pm.collectionVariables.set('lastCashPurchaseId', json.results.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/cash-purchases",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"siteId\": \"SITE-001\",\n  \"forTheMonth\": \"2026-03\",\n  \"vendorName\": \"Local Hardware Store\",\n  \"gstNo\": \"27ABCDE1234F1Z5\",\n  \"products\": [\n    { \"productName\": \"Screwdriver Set\", \"quantity\": 2, \"cost\": 350.00 },\n    { \"productName\": \"Duct Tape\", \"quantity\": 5, \"cost\": 80.00 }\n  ],\n  \"totalCost\": 1100.00,\n  \"billUrl\": \"minio/cash-bills/march-2026-001.jpg\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Cash Purchases",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/cash-purchases",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Approve Cash Purchase",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/cash-purchases/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purchaseId\": \"{{lastCashPurchaseId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject Cash Purchase",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/cash-purchases/{{lastCashPurchaseId}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Bill not legible, please resubmit with clearer image\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Machinery",
+      "item": [
+        {
+          "name": "Get Machinery Options",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/machinery/options",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Create Machinery Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.id) { pm.collectionVariables.set('lastMachineryReqId', json.results.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/machinery-requests",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"siteId\": \"SITE-001\",\n  \"justification\": \"New excavator required for Phase 2 construction work\",\n  \"items\": [\n    { \"machineName\": \"Excavator\", \"quantity\": 1, \"requestType\": \"new\" },\n    { \"machineName\": \"Generator\", \"quantity\": 2, \"requestType\": \"replacement\", \"oldAssetId\": \"AST-001\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "List Machinery Requests",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/machinery-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Request Details for Approval",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/machinery-requests/{{lastMachineryReqId}}/details-for-approval",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Fulfill Machinery Request (creates PO)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.poNumber) { pm.collectionVariables.set('lastMachineryPoNumber', json.results.poNumber); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/machinery-requests/{{lastMachineryReqId}}/fulfill",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorId\": \"{{lastVendorCode}}\",\n  \"expectedDeliveryDate\": \"2026-04-30\",\n  \"region\": \"West\",\n  \"items\": [\n    { \"machineName\": \"Excavator\", \"quantity\": 1, \"landedPrice\": 450000 },\n    { \"machineName\": \"Generator\", \"quantity\": 2, \"landedPrice\": 85000 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject Machinery Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/machinery-requests/{{lastMachineryReqId}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Budget not approved for this quarter\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Vendor Machinery Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/vendor/machinery-orders",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Machinery PO",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/machinery/{{lastMachineryPoNumber}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Machinery PO Delivery",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/procurement/purchase-orders/machinery/{{lastMachineryPoNumber}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Dispatched\",\n  \"deliveryType\": \"Courier\",\n  \"courierName\": \"FedEx\",\n  \"podNumber\": \"FX-9988\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Machinery GRN",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/machinery/{{lastMachineryPoNumber}}/grn",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"signedDcUrl\": \"minio/machinery/signed-dc.pdf\",\n  \"assetConditionProofUrl\": \"minio/machinery/condition-proof.jpg\",\n  \"packagingImages\": [\"minio/machinery/pkg1.jpg\", \"minio/machinery/pkg2.jpg\"],\n  \"comments\": \"All items received in good condition\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Machinery GRN Evidence",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/machinery/grn/{{lastMachineryPoNumber}}/evidence",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Consolidated Machinery Items",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/machinery/consolidated-items",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"poNumbers\": [\"{{lastMachineryPoNumber}}\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Machinery Invoice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.id) { pm.collectionVariables.set('lastMachineryInvoiceId', json.results.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/consolidated/machinery",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceNo\": \"MAC-INV-2026-001\",\n  \"state\": \"Maharashtra\",\n  \"billAmount\": 620000,\n  \"billUrl\": \"minio/invoices/mac-inv-2026-001.pdf\",\n  \"poNumbers\": [\"{{lastMachineryPoNumber}}\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "List Machinery Invoice Approvals",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/invoices/machinery/approval-list",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Approve Machinery Invoice",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/machinery/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceId\": \"{{lastMachineryInvoiceId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject Machinery Invoice",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/machinery/{{lastMachineryInvoiceId}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Bill amount does not match delivery note\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Requestor Machinery Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/requestor/machinery-orders",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Export All Machinery Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/vendor/machinery-orders/export-all",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Uniforms",
+      "item": [
+        {
+          "name": "01 \u00e2\u20ac\u201d Employee Search",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/employees/uniform-search?q=Rahul",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "employees",
+                "uniform-search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Rahul"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has results', () => pm.expect(j.results).to.be.an('array').and.lengthOf.at.least(1));",
+                  "console.log('Employee search count:', j.results.length, '| first:', j.results[0]?.employeeName);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 \u00e2\u20ac\u201d Uniform Configuration",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/uniforms/configuration",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has itemTypes', () => pm.expect(j.results.itemTypes).to.be.an('array').and.lengthOf.at.least(1));",
+                  "console.log('Item types count:', j.results.itemTypes.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 \u00e2\u20ac\u201d Create Uniform Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/uniform-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeCode\": \"EMP-001\",\n  \"employeeName\": \"Priya Singh\",\n  \"designation\": \"Supervisor\",\n  \"site\": \"SITE-001\",\n  \"client\": \"ABC Corp\",\n  \"issueType\": \"new\",\n  \"isEarlyReplacement\": false,\n  \"items\": [\n    { \"itemName\": \"Shirt\", \"size\": \"M\", \"quantity\": 2 },\n    { \"itemName\": \"Trouser\", \"size\": \"32\", \"quantity\": 2 },\n    { \"itemName\": \"Safety Shoes\", \"size\": \"8\", \"quantity\": 1 }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has requestId', () => pm.expect(j.results.requestId).to.match(/^UNF-/));",
+                  "pm.collectionVariables.set('lastUniformReqId', j.results.id);",
+                  "console.log('requestId:', j.results.requestId, '| id:', j.results.id, '| items:', j.results.items.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 \u00e2\u20ac\u201d List Uniform Requests",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/uniform-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('Uniform requests count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 \u00e2\u20ac\u201d Employee Uniform History",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/employees/EMP-001/uniform-history",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('History count for EMP-001:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 \u00e2\u20ac\u201d Fulfill Uniform Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/uniform-requests/{{lastUniformReqId}}/fulfill",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorId\": \"{{lastVendorCode}}\",\n  \"expectedDeliveryDate\": \"2026-04-15\",\n  \"region\": \"West\",\n  \"items\": [\n    { \"itemName\": \"Shirt\",        \"size\": \"M\",  \"quantity\": 2, \"landedPrice\": 450.00 },\n    { \"itemName\": \"Trouser\",      \"size\": \"32\", \"quantity\": 2, \"landedPrice\": 650.00 },\n    { \"itemName\": \"Safety Shoes\", \"size\": \"8\",  \"quantity\": 1, \"landedPrice\": 1200.00 }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has poNumber', () => pm.expect(j.results.poNumber).to.match(/^PO-UNF-/));",
+                  "pm.collectionVariables.set('lastUniformPoNumber', j.results.poNumber);",
+                  "console.log('poNumber:', j.results.poNumber, '| employee:', j.results.employeeName, '| status:', j.results.status);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 \u00e2\u20ac\u201d List Vendor Uniform POs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('Uniform POs count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 \u00e2\u20ac\u201d Get Single Uniform PO",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/{{lastUniformPoNumber}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Correct PO', () => pm.expect(j.results.poNumber).to.equal(pm.collectionVariables.get('lastUniformPoNumber')));",
+                  "console.log('PO items:', j.results.items.length, '| site:', j.results.siteName, '| status:', j.results.status);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 \u00e2\u20ac\u201d Update Uniform PO Delivery",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/{{lastUniformPoNumber}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Transit\",\n  \"deliveryType\": \"Courier\",\n  \"courierName\": \"Delhivery\",\n  \"podNumber\": \"DEL-9988776655\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Status updated', () => pm.expect(j.results.status).to.equal('In Transit'));",
+                  "console.log('status:', j.results.status, '| courier:', j.results.courierName, '| pod:', j.results.podNumber);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 \u00e2\u20ac\u201d Submit Uniform GRN",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/{{lastUniformPoNumber}}/grn",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"signedDcUrl\": \"https://storage.example.com/uniform-dc/signed-dc-001.pdf\",\n  \"comments\": \"All items received in good condition\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.test('Status Delivered', () => pm.expect(j.results.status).to.equal('Delivered'));",
+                  "console.log('GRN submitted | status:', j.results.status, '| dateOfDelivery:', j.results.dateOfDelivery);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 \u00e2\u20ac\u201d Requestor Uniform Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/requestor/uniform-orders",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('Requestor uniform orders count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 \u00e2\u20ac\u201d Get Consolidated Uniform Items",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/consolidated-items",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"poNumbers\": [\"{{lastUniformPoNumber}}\"] }"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has items', () => pm.expect(j.results).to.be.an('array').and.lengthOf.at.least(1));",
+                  "console.log('Consolidated items:', j.results.length, '| first:', j.results[0]?.itemName);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 \u00e2\u20ac\u201d Submit Uniform Invoice",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/consolidated",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceNo\": \"UNFINV-2026-001\",\n  \"state\": \"Maharashtra\",\n  \"billAmount\": 3750.00,\n  \"billUrl\": \"https://storage.example.com/invoices/unf-invoice-001.pdf\",\n  \"poNumbers\": [\"{{lastUniformPoNumber}}\"]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is uniform invoice', () => pm.expect(j.results.invoiceType).to.equal('uniform'));",
+                  "pm.collectionVariables.set('lastUniformInvoiceId', j.results.id);",
+                  "console.log('invoiceId:', j.results.invoiceId, '| type:', j.results.invoiceType, '| status:', j.results.status);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 \u00e2\u20ac\u201d Export All Uniform POs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/export-all",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('Export all uniform POs | Content-Type:', pm.response.headers.get('Content-Type'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 \u00e2\u20ac\u201d Export Requestor Uniform Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/requestor/uniform-orders/export",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('Export requestor uniform orders | Content-Type:', pm.response.headers.get('Content-Type'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "16 \u00e2\u20ac\u201d Export Single Uniform PO",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/{{lastUniformPoNumber}}/export",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('Export single uniform PO | Content-Type:', pm.response.headers.get('Content-Type'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "17 \u00e2\u20ac\u201d Reject Uniform Request (New)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/uniform-requests/{{lastUniformReqId}}/reject",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"rejectionReason\": \"Replacement cycle not completed. Minimum 12 months required.\" }"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// NOTE: This creates a fresh request and rejects it.",
+                  "// Run 'Create Uniform Request' separately before running this to get a fresh ID.",
+                  "// The lastUniformReqId must be in PENDING_PH_APPROVAL status."
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Status REJECTED', () => pm.expect(j.results.status).to.equal('REJECTED'));",
+                  "pm.test('Has rejectionReason', () => pm.expect(j.results.rejectionReason).to.be.a('string'));",
+                  "console.log('status:', j.results.status, '| reason:', j.results.rejectionReason);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "01 \u00e2\u20ac\u201d List Notifications",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/notifications",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "if (j.results.length > 0) {",
+                  "    pm.collectionVariables.set('lastNotificationId', j.results[0].id);",
+                  "}",
+                  "console.log('Notifications count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 \u00e2\u20ac\u201d Mark As Read",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/notifications/mark-as-read",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"ids\": [] }"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has marked count', () => pm.expect(j.results).to.have.property('marked'));",
+                  "console.log('Marked as read:', j.results.marked);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
