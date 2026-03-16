@@ -10,23 +10,11 @@ from app.shared.schemas import ApiResponse, success_response
 from app.shared.file_storage import upload_fastapi_file
 from app.procurement.purchase_orders import service
 from app.procurement.purchase_orders.schemas import (
-    PoCreate, PoResponse, PoUpdateData,
+    PoResponse, PoUpdateData,
     GrnData, GrnResponse,
 )
 
 router = APIRouter()
-
-
-@router.post("", response_model=ApiResponse, status_code=201)
-async def create_purchase_order(
-    data: PoCreate,
-    db: AsyncSession = Depends(get_db),
-    user: TokenPayload = Depends(get_current_user),
-):
-    po = await service.create_purchase_order(db, data, user.sub)
-    po_obj, items = await service.get_po_with_items(db, po.po_number)
-    vendor_name = await service.get_vendor_name(db, po_obj.vendor_code)
-    return success_response(PoResponse.from_orm(po_obj, items=items, vendor_name=vendor_name).model_dump())
 
 
 @router.get("", response_model=ApiResponse)

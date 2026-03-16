@@ -9,75 +9,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.procurement.purchase_orders.models import (
     ProcPurchaseOrder, ProcPoItem, ProcGrn, ProcGrnItem, ProcGrnPhoto,
 )
-from app.procurement.purchase_orders.schemas import PoCreate, PoUpdateData, GrnData
+from app.procurement.purchase_orders.schemas import PoUpdateData, GrnData
 from app.procurement.indents.models import ProcIndent
 from app.procurement.vendors.models import ProcVendor
 from app.procurement.sites.models import Site
-
-
-async def create_purchase_order(db: AsyncSession, data: PoCreate, created_by: str):
-    """Legacy — POs are now auto-created by indent approval."""
-    indent = await db.get(ProcIndent, data.indentId)
-    if not indent:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Indent not found")
-    if indent.status != "PH_APPROVED":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Indent must be PH_APPROVED to create a PO")
-
-    vendor = await db.get(ProcVendor, data.vendorId)
-    if not vendor:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor not found")
-    if vendor.status != "ACTIVE":
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Vendor must be ACTIVE to create a PO")
-
-    now = datetime.now(timezone.utc)
-    count = await db.scalar(select(func.count()).select_from(ProcPurchaseOrder))
-    po_number = f"PO-{now.strftime('%Y%m')}-{(count or 0) + 1:04d}"
-
-    expected_delivery = None
-    tat = None
-    if data.expectedDeliveryDate:
-        expected_delivery = datetime(
-            data.expectedDeliveryDate.year,
-            data.expectedDeliveryDate.month,
-            data.expectedDeliveryDate.day,
-            tzinfo=timezone.utc,
-        )
-        tat = (data.expectedDeliveryDate - now.date()).days
-
-    total_value = sum(item.quantity * item.landedPrice for item in data.items)
-
-    po = ProcPurchaseOrder(
-        po_number=po_number,
-        indent_id=data.indentId,
-        vendor_code=str(data.vendorId),
-        site_id=indent.site_id,
-        po_date=now,
-        expected_delivery_date=expected_delivery,
-        tat=tat,
-        tat_status="On Time" if tat and tat >= 0 else None,
-        status="Not Delivered",
-        total_value=total_value,
-    )
-    db.add(po)
-    await db.flush()
-
-    for item in data.items:
-        item_id = str(item.indentItemId) if item.indentItemId else str(uuid.uuid4())
-        db.add(ProcPoItem(
-            po_id=po.id,
-            item_id=item_id,
-            product_code=str(item.productId) if item.productId else None,
-            product_name=item.productName,
-            quantity=item.quantity,
-            landed_price=item.landedPrice,
-            total_amount=item.quantity * item.landedPrice,
-        ))
-
-    indent.status = "PO_CREATED"
-    await db.commit()
-    return po
 
 
 async def get_po_with_items(db: AsyncSession, po_number: str):

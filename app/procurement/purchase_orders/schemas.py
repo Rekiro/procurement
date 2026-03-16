@@ -1,38 +1,7 @@
 import uuid
-from datetime import date, datetime
+from datetime import datetime
 
-from pydantic import BaseModel, field_validator
-
-
-# --- PO Creation (used internally by indent approval) ---
-
-class PoItemCreate(BaseModel):
-    indentItemId: uuid.UUID | None = None
-    productId: uuid.UUID | None = None
-    productName: str
-    quantity: float
-    landedPrice: float
-
-    @field_validator("quantity", "landedPrice")
-    @classmethod
-    def must_be_positive(cls, v):
-        if v <= 0:
-            raise ValueError("Must be greater than 0")
-        return v
-
-
-class PoCreate(BaseModel):
-    indentId: uuid.UUID
-    vendorId: uuid.UUID
-    expectedDeliveryDate: date | None = None
-    items: list[PoItemCreate]
-
-    @field_validator("items")
-    @classmethod
-    def items_not_empty(cls, v):
-        if not v:
-            raise ValueError("PO must have at least one item")
-        return v
+from pydantic import BaseModel
 
 
 # --- PO Update (parsed from multipart 'data' JSON string) ---

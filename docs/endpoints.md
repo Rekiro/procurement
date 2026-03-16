@@ -107,7 +107,6 @@
 
 | Method | Path | Role | Status | Test | Notes |
 |---|---|---|---|---|---|
-| POST | /api/procurement/purchase-orders | any auth | ✅ | — | Legacy manual PO create (auto PO creation now via indent approve). Needs spec update |
 | GET | /api/procurement/purchase-orders | any auth | ✅ | ✅ | `?search=&page=1&limit=10`. Response includes dcNumber, dcDate, signedDcISmartUrl (PH view fields) |
 | GET | /api/procurement/purchase-orders/export | any auth | ✅ | ✅ | `?search=` optional filter. Excel export matches list view filtering |
 | GET | /api/procurement/purchase-orders/{poNumber}/download | any auth | ✅ | — | `?type=po_pdf|po_excel|dc_pdf`. `po_excel` implemented; `po_pdf`/`dc_pdf` return 501 (needs PDF library) |
