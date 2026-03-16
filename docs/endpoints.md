@@ -108,11 +108,11 @@
 | Method | Path | Role | Status | Test | Notes |
 |---|---|---|---|---|---|
 | POST | /api/procurement/purchase-orders | any auth | ✅ | — | Legacy manual PO create (auto PO creation now via indent approve). Needs spec update |
-| GET | /api/procurement/purchase-orders | any auth | ✅ | ✅ | `?search=&page=1&limit=10`. Response: `{pagination, purchaseOrders}` with rich fields (materialRequestId, siteName, tatStatus, all URL fields) |
-| GET | /api/procurement/purchase-orders/export | any auth | ✅ | ✅ | Download all POs as Excel |
-| GET | /api/procurement/purchase-orders/{poNumber}/download | any auth | 🔧 | — | PDF download — stub (needs PDF library) |
-| PUT | /api/procurement/purchase-orders/{poNumber} | any auth | ✅ | ✅ | Update delivery status (`Dispatched`, `Delivered`, etc.) + courier details |
-| POST | /api/procurement/purchase-orders/{poNumber}/grn | any auth | ✅ | ✅ | Submit GRN with received quantities + photos. Sets PO → `Delivered` |
+| GET | /api/procurement/purchase-orders | any auth | ✅ | ✅ | `?search=&page=1&limit=10`. Response includes dcNumber, dcDate, signedDcISmartUrl (PH view fields) |
+| GET | /api/procurement/purchase-orders/export | any auth | ✅ | ✅ | `?search=` optional filter. Excel export matches list view filtering |
+| GET | /api/procurement/purchase-orders/{poNumber}/download | any auth | ✅ | — | `?type=po_pdf|po_excel|dc_pdf`. `po_excel` implemented; `po_pdf`/`dc_pdf` return 501 (needs PDF library) |
+| PUT | /api/procurement/purchase-orders/{poNumber} | any auth | ✅ | — | **multipart/form-data**: `data` JSON (deliveryType, courierName, podNumber, status, dateOfDelivery, reason) + files (podImage, signedPod, signedDc). Delivered requires all files+fields. Courier requires courierName. Out-of-TAT requires reason |
+| POST | /api/procurement/purchase-orders/{poNumber}/grn | any auth | ✅ | — | **multipart/form-data**: `data` JSON (items, predefinedComment, comments, requestorEmail) + signedDc (required) + photos (up to 2). Sets PO → `GRN_SUBMITTED`. Backend looks up item names/ordered qty from PO items |
 
 ---
 

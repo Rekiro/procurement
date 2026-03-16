@@ -4,7 +4,7 @@ from datetime import date, datetime
 from pydantic import BaseModel, field_validator
 
 
-# --- PO Creation ---
+# --- PO Creation (used internally by indent approval) ---
 
 class PoItemCreate(BaseModel):
     indentItemId: uuid.UUID | None = None
@@ -35,52 +35,54 @@ class PoCreate(BaseModel):
         return v
 
 
-# --- PO Update (delivery status) ---
+# --- PO Update (parsed from multipart 'data' JSON string) ---
 
-class PoUpdateRequest(BaseModel):
-    status: str | None = None
-    deliveryType: str | None = None
+class PoUpdateData(BaseModel):
+    deliveryType: str | None = None       # "Hand" or "Courier"
     courierName: str | None = None
     podNumber: str | None = None
+    status: str | None = None              # "In Transit", "Delivered", "Not Delivered"
+    dateOfDelivery: datetime | None = None  # ISO datetime string
+    reason: str | None = None
 
 
-# --- GRN ---
+# --- GRN (parsed from multipart 'data' JSON string) ---
 
-class GrnItemCreate(BaseModel):
+class GrnItemData(BaseModel):
     itemId: str
-    itemName: str
-    orderedQuantity: float
     receivedQuantity: float
     isAccepted: bool
 
 
-class GrnCreate(BaseModel):
+class GrnData(BaseModel):
+    items: list[GrnItemData]
     predefinedComment: str | None = None
     comments: str | None = None
-    signedDcUrl: str
-    photoUrls: list[str] = []
-    items: list[GrnItemCreate]
+    requestorEmail: str = "admin@smart.com"
 
 
 # --- PO List Item (spec #9.1 / #10.1) ---
 
 class PoListItem(BaseModel):
     """Rich PO list item matching the spec for both vendor and PH views."""
-    materialRequestId: str | None     # indent tracking_no
+    materialRequestId: str | None       # indent tracking_no
     siteName: str | None
     region: str | None
+    dcNumber: str | None
     poNumber: str
-    poDate: str                       # "YYYY-MM-DD"
+    dcDate: str | None                  # "YYYY-MM-DD"
+    poDate: str                         # "YYYY-MM-DD"
     deliveryType: str | None
     tat: int | None
-    expectedDeliveryDate: str | None  # "YYYY-MM-DD"
+    expectedDeliveryDate: str | None    # "YYYY-MM-DD"
     status: str
     courierName: str | None
     podNumber: str | None
-    dateOfDelivery: str | None        # "YYYY-MM-DD"
+    dateOfDelivery: str | None          # "YYYY-MM-DD"
     podImageUrl: str | None
     signedPodUrl: str | None
     signedDcUrl: str | None
+    signedDcISmartUrl: str | None
     tatStatus: str | None
     reason: str | None
 
@@ -90,7 +92,7 @@ class PoListItem(BaseModel):
 class PoItemResponse(BaseModel):
     id: uuid.UUID
     itemId: str
-    productId: uuid.UUID | None
+    productCode: str | None
     productName: str
     quantity: float
     landedPrice: float
@@ -101,7 +103,7 @@ class PoItemResponse(BaseModel):
         return cls(
             id=obj.id,
             itemId=obj.item_id,
-            productId=obj.product_id,
+            productCode=obj.product_code,
             productName=obj.product_name,
             quantity=float(obj.quantity),
             landedPrice=float(obj.landed_price),
@@ -113,7 +115,7 @@ class PoResponse(BaseModel):
     id: uuid.UUID
     poNumber: str
     indentId: uuid.UUID | None
-    vendorId: uuid.UUID | None
+    vendorCode: str | None
     vendorName: str | None
     siteId: str
     poDate: datetime
@@ -134,7 +136,7 @@ class PoResponse(BaseModel):
             id=obj.id,
             poNumber=obj.po_number,
             indentId=obj.indent_id,
-            vendorId=obj.vendor_id,
+            vendorCode=obj.vendor_code,
             vendorName=vendor_name,
             siteId=obj.site_id,
             poDate=obj.po_date,

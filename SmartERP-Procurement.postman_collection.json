@@ -1189,7 +1189,9 @@
               "query": [
                 { "key": "page", "value": "1" },
                 { "key": "limit", "value": "10" },
-                { "key": "search", "value": "", "disabled": true }
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "vendorCode", "value": "", "disabled": true, "description": "Filter by vendor (vendor view)" },
+                { "key": "requestorEmail", "value": "", "disabled": true, "description": "Filter by requestor — includes _indentDetailsPayload with items for GRN form" }
               ]
             },
             "header": [
@@ -1198,62 +1200,152 @@
                 "value": "Bearer {{token}}"
               }
             ],
-            "description": "Paginated PO list. Response: {pagination, purchaseOrders} with rich fields (materialRequestId, siteName, tatStatus, all URL fields). Search filters by PO number, site name, status, tracking no."
+            "description": "Paginated PO list. Three views via optional filters:\n- No filter: PH view (includes dcNumber, dcDate, signedDcISmartUrl)\n- vendorCode: Vendor view (only that vendor's POs)\n- requestorEmail: Requestor view (POs from their indents, includes _indentDetailsPayload with items for GRN form)"
           }
         },
         {
-          "name": "Update Delivery Status",
+          "name": "Update PO - In Transit (multipart)",
           "request": {
             "method": "PUT",
             "url": "{{base_url}}/api/procurement/purchase-orders/{{lastPoNumber}}",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\"deliveryType\":\"Courier\",\"courierName\":\"BlueDart\",\"podNumber\":\"BD123456\",\"status\":\"In Transit\",\"dateOfDelivery\":null,\"reason\":null}",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Multipart/form-data. 'data' is a JSON string with: deliveryType (Hand/Courier), courierName, podNumber, status (In Transit/Delivered/Not Delivered), dateOfDelivery (ISO), reason.\n\nFile fields (required when status=Delivered): podImage, signedPod, signedDc.\n\nValidations: future dateOfDelivery rejected; Delivered requires all 3 files + podNumber + dateOfDelivery; Courier requires courierName; Out-of-TAT requires reason."
+          }
+        },
+        {
+          "name": "Update PO - Delivered (multipart + files)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/procurement/purchase-orders/{{lastPoNumber}}",
+            "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{token}}"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"Dispatched\",\n  \"deliveryType\": \"Courier\",\n  \"courierName\": \"BlueDart\",\n  \"podNumber\": \"BD123456\"\n}"
-            }
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\"deliveryType\":\"Courier\",\"courierName\":\"BlueDart\",\"podNumber\":\"BD123456\",\"status\":\"Delivered\",\"dateOfDelivery\":\"2026-03-16T00:00:00.000Z\",\"reason\":null}",
+                  "type": "text"
+                },
+                {
+                  "key": "podImage",
+                  "type": "file",
+                  "src": "",
+                  "description": "Photo of proof of delivery (JPEG/PNG, required for Delivered)"
+                },
+                {
+                  "key": "signedPod",
+                  "type": "file",
+                  "src": "",
+                  "description": "Signed POD document (PDF, required for Delivered)"
+                },
+                {
+                  "key": "signedDc",
+                  "type": "file",
+                  "src": "",
+                  "description": "Signed Delivery Challan (PDF, required for Delivered)"
+                }
+              ]
+            },
+            "description": "Delivered status requires: dateOfDelivery, podNumber, podImage file, signedPod file, signedDc file. Select actual files in Postman before sending."
           }
         },
         {
-          "name": "Submit GRN",
+          "name": "Download PO Document",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/purchase-orders/{{lastPoNumber}}/download?type=po_pdf",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "purchase-orders", "{{lastPoNumber}}", "download"],
+              "query": [
+                { "key": "type", "value": "po_pdf", "description": "po_pdf | po_excel | dc_pdf" }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "description": "Download PO document. type: po_pdf, po_excel, dc_pdf. Currently returns 501 (PDF generation not implemented)."
+          }
+        },
+        {
+          "name": "Submit GRN (multipart)",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/procurement/purchase-orders/{{lastPoNumber}}/grn",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{token}}"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"signedDcUrl\": \"minio/signed-dc.pdf\",\n  \"predefinedComment\": \"GOOD_CONDITION\",\n  \"photoUrls\": [\"minio/photo1.jpg\"],\n  \"items\": [\n    {\n      \"itemId\": \"item-001\",\n      \"itemName\": \"Safety Helmet\",\n      \"orderedQuantity\": 10,\n      \"receivedQuantity\": 10,\n      \"isAccepted\": true\n    }\n  ]\n}"
-            }
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\"items\":[{\"itemId\":\"item-001\",\"receivedQuantity\":10,\"isAccepted\":true}],\"predefinedComment\":\"GOOD_CONDITION\",\"comments\":null,\"requestorEmail\":\"admin@smart.com\"}",
+                  "type": "text"
+                },
+                {
+                  "key": "signedDc",
+                  "type": "file",
+                  "src": "",
+                  "description": "Signed Delivery Challan (PDF, REQUIRED)"
+                },
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": "",
+                  "disabled": true,
+                  "description": "Optional delivery photos (up to 2, JPEG/PNG)"
+                }
+              ]
+            },
+            "description": "Multipart/form-data. 'data' JSON: items (itemId, receivedQuantity, isAccepted), predefinedComment, comments (required if predefinedComment=OTHER), requestorEmail.\n\nRequired file: signedDc (PDF). Optional: photos (up to 2 images).\n\nBackend looks up item names and ordered quantities from PO items. Sets PO status to GRN_SUBMITTED."
           }
         },
         {
           "name": "Export POs to Excel",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/procurement/purchase-orders/export",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/purchase-orders/export",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "purchase-orders", "export"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true, "description": "Filter export by PO number, status, or site" }
+              ]
+            },
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{token}}"
               }
-            ]
+            ],
+            "description": "Export POs to Excel. Optional search param filters results to match list view."
           }
         }
       ]

@@ -1,6 +1,8 @@
 import uuid
 from datetime import datetime, timezone
 
+from datetime import date as date_type
+
 from sqlalchemy import String, DateTime, Integer, Numeric, Date, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -29,6 +31,9 @@ class ProcPurchaseOrder(Base):
     pod_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     signed_pod_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     signed_dc_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    dc_number: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    dc_date: Mapped[date_type | None] = mapped_column(Date, nullable=True)
+    signed_dc_ismart_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     total_value: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
