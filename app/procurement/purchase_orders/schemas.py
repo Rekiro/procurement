@@ -160,16 +160,24 @@ class GrnItemResponse(BaseModel):
     orderedQuantity: float
     receivedQuantity: float
     isAccepted: bool
+    deliveryStatus: str   # "Complete", "Partial", "Over-Delivered"
 
     @classmethod
     def from_orm(cls, obj):
+        ordered = float(obj.ordered_quantity)
+        received = float(obj.received_quantity)
+        if received >= ordered:
+            ds = "Over-Delivered" if received > ordered else "Complete"
+        else:
+            ds = "Partial"
         return cls(
             id=obj.id,
             itemId=obj.item_id,
             itemName=obj.item_name,
-            orderedQuantity=float(obj.ordered_quantity),
-            receivedQuantity=float(obj.received_quantity),
+            orderedQuantity=ordered,
+            receivedQuantity=received,
             isAccepted=obj.is_accepted,
+            deliveryStatus=ds,
         )
 
 
