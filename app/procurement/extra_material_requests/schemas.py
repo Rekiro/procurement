@@ -1,20 +1,46 @@
-import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
+
+# --- Create (EP34) ---
 
 class ExtraMaterialRequestCreate(BaseModel):
-    siteId: str
-    monthYear: str   # "YYYY-MM"
+    siteId: str = Field(..., min_length=1)
+    monthYear: str = Field(..., min_length=1)
+    reason: str = Field(..., min_length=1)
+    requestorEmail: EmailStr = "admin@smart.com"
+
+
+# --- Approve / Reject ---
+
+class ApproveEMRRequest(BaseModel):
+    emrIds: list[str]   # business IDs like ["EMR-2026-001"]
+
+
+class RejectEMRRequest(BaseModel):
     reason: str
 
 
+# --- List item response (EP35) ---
+
+class EMRListItem(BaseModel):
+    emrId: str
+    siteName: str
+    monthYear: str          # "November 2025"
+    reason: str
+    requesterName: str
+    requestDate: str        # ISO datetime
+    status: str
+
+
+# --- Create / detail response ---
+
 class ExtraMaterialRequestResponse(BaseModel):
-    id: uuid.UUID
+    emrId: str
     siteId: str
     requestorEmail: str
-    monthYear: str
+    monthYear: str          # "YYYY-MM"
     reason: str
     status: str
     rejectionReason: str | None
@@ -22,12 +48,10 @@ class ExtraMaterialRequestResponse(BaseModel):
     reviewedAt: datetime | None
     createdAt: datetime
 
-    model_config = {"from_attributes": True}
-
     @classmethod
-    def model_validate(cls, obj, **kwargs):
+    def from_orm(cls, obj):
         return cls(
-            id=obj.id,
+            emrId=obj.emr_id,
             siteId=obj.site_id,
             requestorEmail=obj.requestor_email,
             monthYear=obj.month_year.strftime("%Y-%m") if obj.month_year else "",
@@ -38,11 +62,3 @@ class ExtraMaterialRequestResponse(BaseModel):
             reviewedAt=obj.reviewed_at,
             createdAt=obj.created_at,
         )
-
-
-class ApproveEMRRequest(BaseModel):
-    requestId: uuid.UUID
-
-
-class RejectEMRRequest(BaseModel):
-    rejectionReason: str

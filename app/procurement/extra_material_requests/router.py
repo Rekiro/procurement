@@ -19,10 +19,11 @@ router = APIRouter()
 @router.get("/status", response_model=ApiResponse)
 async def get_emr_status(
     siteId: str = Query(...),
+    requestorEmail: str = Query("admin@smart.com"),
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    result = await service.get_status(db, user.sub, siteId)
+    result = await service.get_status(db, requestorEmail, siteId)
     return success_response(result)
 
 
@@ -32,18 +33,22 @@ async def create_emr(
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    emr = await service.create_request(db, data, user.sub)
-    return success_response(ExtraMaterialRequestResponse.model_validate(emr).model_dump())
+    emr = await service.create_request(db, data)
+    return success_response(ExtraMaterialRequestResponse.from_orm(emr).model_dump())
 
 
 @router.get("", response_model=ApiResponse)
 async def list_emrs(
-    status: str | None = None,
+    status: str = Query(..., description="Filter by status, e.g. 'pending'"),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    emrs = await service.list_requests(db, status_filter=status)
-    return success_response([ExtraMaterialRequestResponse.model_validate(e).model_dump() for e in emrs])
+    requests_list, pagination = await service.list_requests_paginated(
+        db, status_filter=status, page=page, limit=limit
+    )
+    return success_response({"pagination": pagination, "requests": requests_list})
 
 
 @router.post("/approve", response_model=ApiResponse)
@@ -52,8 +57,8 @@ async def approve_emr(
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    emr = await service.approve_request(db, data, approved_by=user.sub)
-    return success_response(ExtraMaterialRequestResponse.model_validate(emr).model_dump())
+    emrs = await service.approve_requests(db, data.emrIds, approved_by=user.sub)
+    return success_response([ExtraMaterialRequestResponse.from_orm(e).model_dump() for e in emrs])
 
 
 @router.post("/{request_id}/reject", response_model=ApiResponse)
@@ -64,4 +69,4 @@ async def reject_emr(
     user: TokenPayload = Depends(get_current_user),
 ):
     emr = await service.reject_request(db, request_id, data, reviewed_by=user.sub)
-    return success_response(ExtraMaterialRequestResponse.model_validate(emr).model_dump())
+    return success_response(ExtraMaterialRequestResponse.from_orm(emr).model_dump())

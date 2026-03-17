@@ -1,64 +1,40 @@
-import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CashPurchaseProductItem(BaseModel):
-    productName: str
-    quantity: float
-    cost: float
+    productName: str = Field(..., min_length=1)
+    quantity: float = Field(..., gt=0)
+    cost: float = Field(..., gt=0)
 
 
 class CashPurchaseCreate(BaseModel):
-    siteId: str
-    forTheMonth: str          # "YYYY-MM"
+    requestorEmail: str = Field(..., min_length=1)
+    siteId: str = Field(..., min_length=1)
+    forTheMonth: str = Field(..., min_length=1)
     vendorName: str | None = None
     gstNo: str | None = None
-    products: list[CashPurchaseProductItem]
-    totalCost: float
-    billUrl: str
+    products: list[CashPurchaseProductItem] = Field(..., min_length=1)
 
 
-class CashPurchaseResponse(BaseModel):
-    id: uuid.UUID
+class CashPurchaseListItem(BaseModel):
     purchaseId: str
-    requestorEmail: str
-    siteId: str
-    forTheMonth: str
+    requesterName: str
+    requestDate: str
+    forTheMonth: str           # "Month YYYY"
+    site: str
     vendorName: str | None
     gstNo: str | None
-    products: list[dict]
-    totalCost: float
     billUrl: str
+    products: list[dict]
+    totalValue: float
     status: str
-    rejectionReason: str | None
-    createdAt: datetime
-
-    model_config = {"from_attributes": True}
-
-    @classmethod
-    def from_orm(cls, obj):
-        return cls(
-            id=obj.id,
-            purchaseId=obj.purchase_id,
-            requestorEmail=obj.requestor_email,
-            siteId=obj.site_id,
-            forTheMonth=obj.for_the_month.strftime("%Y-%m"),
-            vendorName=obj.vendor_name,
-            gstNo=obj.gst_no,
-            products=obj.products if isinstance(obj.products, list) else [],
-            totalCost=float(obj.total_cost),
-            billUrl=obj.bill_url,
-            status=obj.status,
-            rejectionReason=obj.rejection_reason,
-            createdAt=obj.created_at,
-        )
 
 
 class ApproveCashPurchaseRequest(BaseModel):
-    purchaseId: uuid.UUID
+    purchaseIds: list[str] = Field(..., min_length=1)
 
 
 class RejectCashPurchaseRequest(BaseModel):
-    rejectionReason: str
+    reason: str = Field(..., min_length=1)

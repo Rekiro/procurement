@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -131,20 +133,29 @@ async def get_site_history(
 @router.get("/sites/{site_id}/indent-history", response_model=ApiResponse)
 async def get_site_indent_history(
     site_id: str,
+    month: str = Query(..., description="Month to filter by, format: YYYY-MM"),
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    indents = await service.get_site_indent_history(db, site_id)
+    site = await service.get_site(db, site_id)
+    site_name = site.location_name if site else site_id
+    indents = await service.get_site_indent_history(db, site_id, month=month)
+
+    def _fmt_month_year(for_month: str) -> str:
+        try:
+            return datetime.strptime(for_month + "-01", "%Y-%m-%d").strftime("%B %Y")
+        except ValueError:
+            return for_month
+
     return success_response([
         SiteIndentHistoryItem(
-            id=i.id,
             trackingNo=i.tracking_no,
-            requestorEmail=i.requestor_email,
-            forMonth=i.for_month,
             category=i.category,
+            value=float(i.total_value),
             status=i.status,
-            totalValue=float(i.total_value),
-            createdAt=i.created_at,
+            siteName=site_name,
+            monthYear=_fmt_month_year(i.for_month),
+            siteBudget=None,
         ).model_dump()
         for i in indents
     ])

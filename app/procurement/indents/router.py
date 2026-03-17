@@ -31,7 +31,7 @@ async def create_indent(
 
 @router.get("", response_model=ApiResponse)
 async def list_indents(
-    status: str | None = None,
+    status: str = Query(..., description="Filter by status, e.g. PENDING_PH_APPROVAL"),
     search: str | None = None,
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
@@ -90,49 +90,13 @@ async def approve_indent(
     return success_response(results)
 
 
+
 @router.get("/{tracking_no:path}", response_model=ApiResponse)
 async def get_indent(
     tracking_no: str,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    indent, items, site_name = await service.get_indent_detail(db, tracking_no)
-    products = await service.get_indent_detail_products(db, items)
-
-    total_qty = sum(p["quantity"] for p in products)
-    total_before_tax = sum(float(i.unit_price) * float(i.quantity) for i in items)
-    total_after_tax = sum(p["amount"] for p in products)
-
-    return success_response(IndentDetailResponse(
-        trackingNo=indent.tracking_no,
-        requestDate=indent.created_at.strftime("%Y-%m-%d"),
-        monthYear=indent.for_month,
-        branch=None,
-        branchGst=indent.branch_gst,
-        client=None,
-        siteName=site_name,
-        requestCategory=indent.request_category,
-        categoryType=indent.category,
-        narration=indent.narration,
-        documentUrl=None,
-        vendor="Multiple",
-        products=[IndentDetailProduct(**p) for p in products],
-        totalQty=total_qty,
-        salesTotalBeforeTax=round(total_before_tax, 2),
-        salesTotalAfterTax=round(total_after_tax, 2),
-        purchaseTotalBeforeTax=round(total_before_tax, 2),
-        purchaseTotalAfterTax=round(total_after_tax, 2),
-    ).model_dump())
-
-
-@router.put("/{tracking_no:path}", response_model=ApiResponse)
-async def update_indent(
-    tracking_no: str,
-    data: IndentUpdate,
-    db: AsyncSession = Depends(get_db),
-    user: TokenPayload = Depends(get_current_user),
-):
-    await service.update_indent(db, tracking_no, data)
     indent, items, site_name = await service.get_indent_detail(db, tracking_no)
     products = await service.get_indent_detail_products(db, items)
 
@@ -173,3 +137,42 @@ async def reject_indent(
         "trackingNo": indent.tracking_no,
         "status": indent.status,
     })
+
+
+@router.put("/{tracking_no:path}", response_model=ApiResponse)
+async def update_indent(
+    tracking_no: str,
+    data: IndentUpdate,
+    db: AsyncSession = Depends(get_db),
+    user: TokenPayload = Depends(get_current_user),
+):
+    await service.update_indent(db, tracking_no, data)
+    indent, items, site_name = await service.get_indent_detail(db, tracking_no)
+    products = await service.get_indent_detail_products(db, items)
+
+    total_qty = sum(p["quantity"] for p in products)
+    total_before_tax = sum(float(i.unit_price) * float(i.quantity) for i in items)
+    total_after_tax = sum(p["amount"] for p in products)
+
+    return success_response(IndentDetailResponse(
+        trackingNo=indent.tracking_no,
+        requestDate=indent.created_at.strftime("%Y-%m-%d"),
+        monthYear=indent.for_month,
+        branch=None,
+        branchGst=indent.branch_gst,
+        client=None,
+        siteName=site_name,
+        requestCategory=indent.request_category,
+        categoryType=indent.category,
+        narration=indent.narration,
+        documentUrl=None,
+        vendor="Multiple",
+        products=[IndentDetailProduct(**p) for p in products],
+        totalQty=total_qty,
+        salesTotalBeforeTax=round(total_before_tax, 2),
+        salesTotalAfterTax=round(total_after_tax, 2),
+        purchaseTotalBeforeTax=round(total_before_tax, 2),
+        purchaseTotalAfterTax=round(total_after_tax, 2),
+    ).model_dump())
+
+

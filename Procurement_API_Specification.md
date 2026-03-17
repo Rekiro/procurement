@@ -1032,60 +1032,40 @@ This is the primary API that populates the main table with all purchase orders, 
 **Success Response (200 OK)**
 
 A JSON object with pagination details and an array of purchase order objects. Each object in the array must match the ReadOnlyPurchaseOrder interface exactly.
-
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 15, "totalItems": 145 },
-
-"purchaseOrders": [
-
-{
-
-"materialRequestId": "IND/2025/50808",
-
-"siteName": "siteB",
-
-"region": "West",
-
-"dcNumber": "DC-10234",
-
-"poNumber": "PO-951432",
-
-"dcDate": "2025-10-29",
-
-"poDate": "2025-10-28",
-
-"deliveryType": "Courier",
-
-"tat": 7,
-
-"courierName": "Blue Dart",
-
-"podNumber": "BD12345678",
-
-"podImageUrl": "https://storage.cloud.com/docs/pod-image.jpg",
-
-"signedPodUrl": "https://storage.cloud.com/docs/signed-pod.pdf",
-
-"signedDcUrl": "https://storage.cloud.com/docs/signed-dc-by-vendor.pdf",
-
-"signedDcISmartUrl": "https://storage.cloud.com/docs/signed-dc-by-site.pdf",
-
-"expectedDeliveryDate": "2025-11-04",
-
-"status": "GRN_SUBMITTED",
-
-"dateOfDelivery": "2025-10-29",
-
-"tatStatus": "Within TAT",
-
-"reason": null
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 15,
+        "totalItems": 145
+    },
+    "purchaseOrders": [
+        {
+            "materialRequestId": "IND/2025/50808",
+            "siteName": "siteB",
+            "region": "West",
+            "dcNumber": "DC-10234",
+            "poNumber": "PO-951432",
+            "dcDate": "2025-10-29",
+            "poDate": "2025-10-28",
+            "deliveryType": "Courier",
+            "tat": 7,
+            "courierName": "Blue Dart",
+            "podNumber": "BD12345678",
+            "podImageUrl": "https://storage.cloud.com/docs/pod-image.jpg",
+            "signedPodUrl": "https://storage.cloud.com/docs/signed-pod.pdf",
+            "signedDcUrl": "https://storage.cloud.com/docs/signed-dc-by-vendor.pdf",
+            "signedDcISmartUrl": "https://storage.cloud.com/docs/signed-dc-by-site.pdf",
+            "expectedDeliveryDate": "2025-11-04",
+            "status": "GRN_SUBMITTED",
+            "dateOfDelivery": "2025-10-29",
+            "tatStatus": "Within TAT",
+            "reason": null
+        }
+    ]
 }
+```
 
-]
-
-}
 
 **2. API to Download PO/DC Documents**
 
@@ -1139,113 +1119,62 @@ This is the primary API that populates the main table with all POs created from 
 
 A JSON object with pagination info and an array of PurchaseOrder objects. Each PO object must include the _indentDetailsPayload with its items array, as this is required to build the GRN form.
 
+```json
 {
-
-"pagination": {
-
-"currentPage": 1,
-
-"totalPages": 2,
-
-"totalItems": 18,
-
-"pageSize": 10
-
-},
-
-"purchaseOrders": [
-
-{
-
-"materialRequestId": "IND/2025/50808",
-
-"siteName": "siteB",
-
-"region": "West",
-
-"dcNumber": "DC-10234",
-
-"poNumber": "PO-951432",
-
-"dcDate": "2025-10-29",
-
-"poDate": "2025-10-28",
-
-"deliveryType": "Courier",
-
-"tat": 7,
-
-"courierName": "Blue Dart",
-
-"podNumber": "BD12345678",
-
-"podImageUrl": "https://storage.cloud.com/docs/pod-image.jpg",
-
-"signedPodUrl": "https://storage.cloud.com/docs/signed-pod.pdf",
-
-"signedDcUrl": "https://storage.cloud.com/docs/signed-dc-by-vendor.pdf",
-
-"signedDciSmartUrl": "https://storage.cloud.com/docs/signed-dc-by-site.pdf",
-
-"expectedDeliveryDate": "2025-11-04",
-
-"status": "Delivered",
-
-"dateOfDelivery": "2025-10-29",
-
-"tatStatus": "Within TAT",
-
-"reason": null,
-
-"_indentDetailsPayload": {
-
-"trackingId": "IND/2025/50808",
-
-"items": [
-
-{
-
-"productCode": "P03387",
-
-"productName": "ALL KLEAN - 1LTR",
-
-"quantity": 3,
-
-"siteName": "siteB",
-
-"landedPrice": 86.40
-
-},
-
-{
-
-"productCode": "P03389",
-
-"productName": "ALL OUT MACHINE - MS",
-
-"quantity": 1,
-
-"siteName": "siteB",
-
-"landedPrice": 102.00
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 2,
+        "totalItems": 18,
+        "pageSize": 10
+    },
+    "purchaseOrders": [
+        {
+            "materialRequestId": "IND/2025/50808",
+            "siteName": "siteB",
+            "region": "West",
+            "dcNumber": "DC-10234",
+            "poNumber": "PO-951432",
+            "dcDate": "2025-10-29",
+            "poDate": "2025-10-28",
+            "deliveryType": "Courier",
+            "tat": 7,
+            "courierName": "Blue Dart",
+            "podNumber": "BD12345678",
+            "podImageUrl": "https://storage.cloud.com/docs/pod-image.jpg",
+            "signedPodUrl": "https://storage.cloud.com/docs/signed-pod.pdf",
+            "signedDcUrl": "https://storage.cloud.com/docs/signed-dc-by-vendor.pdf",
+            "signedDciSmartUrl": "https://storage.cloud.com/docs/signed-dc-by-site.pdf",
+            "expectedDeliveryDate": "2025-11-04",
+            "status": "Delivered",
+            "dateOfDelivery": "2025-10-29",
+            "tatStatus": "Within TAT",
+            "reason": null,
+            "_indentDetailsPayload": {
+                "trackingId": "IND/2025/50808",
+                "items": [
+                    {
+                        "productCode": "P03387",
+                        "productName": "ALL KLEAN - 1LTR",
+                        "quantity": 3,
+                        "siteName": "siteB",
+                        "landedPrice": 86.40
+                    },
+                    {
+                        "productCode": "P03389",
+                        "productName": "ALL OUT MACHINE - MS",
+                        "quantity": 1,
+                        "siteName": "siteB",
+                        "landedPrice": 102.00
+                    }
+                ],
+                "isMonthly": true,
+                "forMonth": "September 2025",
+                "totalValue": 1285.20
+            }
+        }
+    ]
 }
-
-],
-
-"isMonthly": true,
-
-"forMonth": "September 2025",
-
-"totalValue": 1285.20
-
-}
-
-}
-
-]
-
-}
+```
 
 **2. API to Submit a Goods Reception Note (GRN)**
 
@@ -1297,22 +1226,24 @@ _The frontend sends only what the user has entered, not the original order detai
 A multipart/form-data request with these parts:
 
 - **data field:**
-
+```json
 {
-
-"items": [
-
-{ "itemId": "PO-951432-0", "receivedQuantity": 3, "isAccepted": true },
-
-{ "itemId": "PO-951432-1", "receivedQuantity": 0, "isAccepted": false }
-
-],
-
-"predefinedComment": "SHORT_QUANTITY",
-
-"comments": "The All Out Machine was missing from the delivery."
-
+    "items": [
+        {
+            "itemId": "PO-951432-0",
+            "receivedQuantity": 3,
+            "isAccepted": true
+        },
+        {
+            "itemId": "PO-951432-1",
+            "receivedQuantity": 0,
+            "isAccepted": false
+        }
+    ],
+    "predefinedComment": "SHORT_QUANTITY",
+    "comments": "The All Out Machine was missing from the delivery."
 }
+```
 
 - **photos field:** (binary data for damaged_box.jpeg)
 - **signedDc field:** (binary data for signed_delivery_challan.pdf)
@@ -1380,283 +1311,149 @@ This is the primary API that populates the main table with all POs eligible for 
 
 A JSON object containing pagination details, a list of states for the filter dropdown, and a comprehensive array of PurchaseOrder objects. Each PO object includes all necessary nested data (grnDetails, _indentDetailsPayload) for the frontend to function correctly.
 
+```json
 {
-
-"pagination": {
-
-"currentPage": 1,
-
-"totalPages": 2,
-
-"totalItems": 15,
-
-"pageSize": 10
-
-},
-
-"availableStates": [
-
-"West",
-
-"South"
-
-],
-
-"purchaseOrders": [
-
-{
-
-"materialRequestId": "IND/2025/50808",
-
-"siteName": "Mumbai Central Site",
-
-"region": "West",
-
-"dcNumber": "DC-10234",
-
-"poNumber": "PO-951432",
-
-"dcDate": "2025-10-29",
-
-"poDate": "2025-10-28",
-
-"deliveryType": "Courier",
-
-"tat": 7,
-
-"courierName": "Blue Dart",
-
-"podNumber": "BD12345678",
-
-"podImageUrl": "https://storage.cloud.com/docs/pod-image.jpg",
-
-"signedPodUrl": "https://storage.cloud.com/docs/signed-pod.pdf",
-
-"signedDcUrl": "https://storage.cloud.com/docs/signed-dc-by-vendor.pdf",
-
-"expectedDeliveryDate": "2025-11-04",
-
-"status": "GRN_SUBMITTED",
-
-"dateOfDelivery": "2025-10-29",
-
-"tatStatus": "Within TAT",
-
-"reason": null,
-
-"invoiceDetails": null,
-
-"_indentDetailsPayload": {
-
-"trackingId": "IND/2025/50808",
-
-"items": [
-
-{
-
-"productCode": "P03387",
-
-"productName": "ALL KLEAN - 1LTR",
-
-"quantity": 3,
-
-"siteName": "Mumbai Central Site",
-
-"landedPrice": 86.40
-
-},
-
-{
-
-"productCode": "P03389",
-
-"productName": "ALL OUT MACHINE - MS",
-
-"quantity": 1,
-
-"siteName": "Mumbai Central Site",
-
-"landedPrice": 102.00
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 2,
+        "totalItems": 15,
+        "pageSize": 10
+    },
+    "availableStates": [
+        "West",
+        "South"
+    ],
+    "purchaseOrders": [
+        {
+            "materialRequestId": "IND/2025/50808",
+            "siteName": "Mumbai Central Site",
+            "region": "West",
+            "dcNumber": "DC-10234",
+            "poNumber": "PO-951432",
+            "dcDate": "2025-10-29",
+            "poDate": "2025-10-28",
+            "deliveryType": "Courier",
+            "tat": 7,
+            "courierName": "Blue Dart",
+            "podNumber": "BD12345678",
+            "podImageUrl": "https://storage.cloud.com/docs/pod-image.jpg",
+            "signedPodUrl": "https://storage.cloud.com/docs/signed-pod.pdf",
+            "signedDcUrl": "https://storage.cloud.com/docs/signed-dc-by-vendor.pdf",
+            "expectedDeliveryDate": "2025-11-04",
+            "status": "GRN_SUBMITTED",
+            "dateOfDelivery": "2025-10-29",
+            "tatStatus": "Within TAT",
+            "reason": null,
+            "invoiceDetails": null,
+            "_indentDetailsPayload": {
+                "trackingId": "IND/2025/50808",
+                "items": [
+                    {
+                        "productCode": "P03387",
+                        "productName": "ALL KLEAN - 1LTR",
+                        "quantity": 3,
+                        "siteName": "Mumbai Central Site",
+                        "landedPrice": 86.40
+                    },
+                    {
+                        "productCode": "P03389",
+                        "productName": "ALL OUT MACHINE - MS",
+                        "quantity": 1,
+                        "siteName": "Mumbai Central Site",
+                        "landedPrice": 102.00
+                    }
+                ],
+                "isMonthly": true,
+                "forMonth": "September 2025",
+                "totalValue": 361.20
+            },
+            "grnDetails": {
+                "items": [
+                    {
+                        "itemId": "PO-951432-0",
+                        "itemName": "ALL KLEAN - 1LTR",
+                        "orderedQuantity": 3,
+                        "receivedQuantity": 3,
+                        "isAccepted": true
+                    },
+                    {
+                        "itemId": "PO-951432-1",
+                        "itemName": "ALL OUT MACHINE - MS",
+                        "orderedQuantity": 1,
+                        "receivedQuantity": 1,
+                        "isAccepted": true
+                    }
+                ],
+                "signedDc": "https://storage.cloud.com/grn-docs/signed-dc-by-site.pdf",
+                "comments": "All items received in good condition."
+            }
+        },
+        {
+            "materialRequestId": "IND/2025/50810",
+            "siteName": "Pune Westgate",
+            "region": "West",
+            "dcNumber": "DC-10235",
+            "poNumber": "PO-951435",
+            "dcDate": "2025-10-30",
+            "poDate": "2025-10-29",
+            "deliveryType": "Hand",
+            "tat": 3,
+            "courierName": null,
+            "podNumber": "Hand-Delivered",
+            "podImageUrl": "https://storage.cloud.com/docs/pod-image-2.jpg",
+            "signedPodUrl": "https://storage.cloud.com/docs/signed-pod-2.pdf",
+            "signedDcUrl": "https://storage.cloud.com/docs/signed-dc-by-vendor-2.pdf",
+            "expectedDeliveryDate": "2025-11-01",
+            "status": "GRN_SUBMITTED",
+            "dateOfDelivery": "2025-10-30",
+            "tatStatus": "Within TAT",
+            "reason": null,
+            "invoiceDetails": [
+                {
+                    "id": "INV-XYZ789",
+                    "invoiceNo": "INV-FINAL-789",
+                    "state": "West",
+                    "billAmount": 499.95,
+                    "billUrl": "https://storage.cloud.com/invoices/inv-final-789.pdf",
+                    "uploadedAt": "2025-10-31T10:00:00.000Z",
+                    "status": "Pending",
+                    "linkedPoNumbers": [
+                        "PO-951435"
+                    ]
+                }
+            ],
+            "_indentDetailsPayload": {
+                "trackingId": "IND/2025/50810",
+                "items": [
+                    {
+                        "productCode": "P04112",
+                        "productName": "Safety Gloves (Pack of 10)",
+                        "quantity": 5,
+                        "siteName": "Pune Westgate",
+                        "landedPrice": 99.99
+                    }
+                ],
+                "isMonthly": false,
+                "forMonth": "October 2025",
+                "totalValue": 499.95
+            },
+            "grnDetails": {
+                "items": [
+                    {
+                        "itemId": "PO-951435-0",
+                        "itemName": "Safety Gloves (Pack of 10)",
+                        "orderedQuantity": 5,
+                        "receivedQuantity": 5,
+                        "isAccepted": true
+                    }
+                ],
+                "signedDc": "https://storage.cloud.com/grn-docs/signed-dc-by-site-2.pdf",
+                "comments": ""
+            }
+        }
+    ]
 }
-
-],
-
-"isMonthly": true,
-
-"forMonth": "September 2025",
-
-"totalValue": 361.20
-
-},
-
-"grnDetails": {
-
-"items": [
-
-{
-
-"itemId": "PO-951432-0",
-
-"itemName": "ALL KLEAN - 1LTR",
-
-"orderedQuantity": 3,
-
-"receivedQuantity": 3,
-
-"isAccepted": true
-
-},
-
-{
-
-"itemId": "PO-951432-1",
-
-"itemName": "ALL OUT MACHINE - MS",
-
-"orderedQuantity": 1,
-
-"receivedQuantity": 1,
-
-"isAccepted": true
-
-}
-
-],
-
-"signedDc": "https://storage.cloud.com/grn-docs/signed-dc-by-site.pdf",
-
-"comments": "All items received in good condition."
-
-}
-
-},
-
-{
-
-"materialRequestId": "IND/2025/50810",
-
-"siteName": "Pune Westgate",
-
-"region": "West",
-
-"dcNumber": "DC-10235",
-
-"poNumber": "PO-951435",
-
-"dcDate": "2025-10-30",
-
-"poDate": "2025-10-29",
-
-"deliveryType": "Hand",
-
-"tat": 3,
-
-"courierName": null,
-
-"podNumber": "Hand-Delivered",
-
-"podImageUrl": "https://storage.cloud.com/docs/pod-image-2.jpg",
-
-"signedPodUrl": "https://storage.cloud.com/docs/signed-pod-2.pdf",
-
-"signedDcUrl": "https://storage.cloud.com/docs/signed-dc-by-vendor-2.pdf",
-
-"expectedDeliveryDate": "2025-11-01",
-
-"status": "GRN_SUBMITTED",
-
-"dateOfDelivery": "2025-10-30",
-
-"tatStatus": "Within TAT",
-
-"reason": null,
-
-"invoiceDetails": [
-
-{
-
-"id": "INV-XYZ789",
-
-"invoiceNo": "INV-FINAL-789",
-
-"state": "West",
-
-"billAmount": 499.95,
-
-"billUrl": "https://storage.cloud.com/invoices/inv-final-789.pdf",
-
-"uploadedAt": "2025-10-31T10:00:00.000Z",
-
-"status": "Pending",
-
-"linkedPoNumbers": ["PO-951435"]
-
-}
-
-],
-
-"_indentDetailsPayload": {
-
-"trackingId": "IND/2025/50810",
-
-"items": [
-
-{
-
-"productCode": "P04112",
-
-"productName": "Safety Gloves (Pack of 10)",
-
-"quantity": 5,
-
-"siteName": "Pune Westgate",
-
-"landedPrice": 99.99
-
-}
-
-],
-
-"isMonthly": false,
-
-"forMonth": "October 2025",
-
-"totalValue": 499.95
-
-},
-
-"grnDetails": {
-
-"items": [
-
-{
-
-"itemId": "PO-951435-0",
-
-"itemName": "Safety Gloves (Pack of 10)",
-
-"orderedQuantity": 5,
-
-"receivedQuantity": 5,
-
-"isAccepted": true
-
-}
-
-],
-
-"signedDc": "https://storage.cloud.com/grn-docs/signed-dc-by-site-2.pdf",
-
-"comments": ""
-
-}
-
-}
-
-]
-
-}
+```
 
 **2. API to Fetch Full Indent Details (for View PO Modal)**
 
@@ -1705,17 +1502,17 @@ This is the most important step. Before accepting the invoice, the backend must
 
 - **data field:**
 
+```json
 {
-
-"poNumbers": ["PO-951432", "PO-951433"],
-
-"invoiceNo": "INV-ABC-2025-101",
-
-"state": "West",
-
-"billAmount": 15200.00
-
+    "poNumbers": [
+        "PO-951432",
+        "PO-951433"
+    ],
+    "invoiceNo": "INV-ABC-2025-101",
+    "state": "West",
+    "billAmount": 15200.00
 }
+```
 
 - **billUpload field:** (binary data for official_invoice.pdf)
 
@@ -1740,155 +1537,126 @@ This is the primary API that populates the main table with all vendor invoices a
 
 A JSON object with pagination, filter options, and an array of ApprovalInvoice objects.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 4, "totalItems": 35 },
-
-"filterOptions": {
-
-"sites": ["siteB", "siteC"],
-
-"states": ["West", "South"]
-
-},
-
-"invoices": [
-
-{
-
-"invoiceId": "INV-XYZ789",
-
-"invoiceNo": "INV-ABC-2025-101",
-
-"invoiceDate": "2025-10-31T10:00:00.000Z",
-
-"billAmount": 1061.20,
-
-"state": "West",
-
-"billUrl": "https://storage.cloud.com/invoices/inv-abc-101.pdf",
-
-"status": "Pending",
-
-"relatedPurchaseOrders": [
-
-{
-
-"poNumber": "PO-951432",
-
-"materialRequestId": "IND/2025/50808",
-
-"siteName": "Mumbai Central Site",
-
-"poDate": "2025-10-28"
-
-},
-
-{
-
-"poNumber": "PO-951433",
-
-"materialRequestId": "IND/2025/50809",
-
-"siteName": "Pune Westgate",
-
-"poDate": "2025-10-28"
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 4,
+        "totalItems": 35
+    },
+    "filterOptions": {
+        "sites": [
+            "siteB",
+            "siteC"
+        ],
+        "states": [
+            "West",
+            "South"
+        ]
+    },
+    "invoices": [
+        {
+            "invoiceId": "INV-XYZ789",
+            "invoiceNo": "INV-ABC-2025-101",
+            "invoiceDate": "2025-10-31T10:00:00.000Z",
+            "billAmount": 1061.20,
+            "state": "West",
+            "billUrl": "https://storage.cloud.com/invoices/inv-abc-101.pdf",
+            "status": "Pending",
+            "relatedPurchaseOrders": [
+                {
+                    "poNumber": "PO-951432",
+                    "materialRequestId": "IND/2025/50808",
+                    "siteName": "Mumbai Central Site",
+                    "poDate": "2025-10-28"
+                },
+                {
+                    "poNumber": "PO-951433",
+                    "materialRequestId": "IND/2025/50809",
+                    "siteName": "Pune Westgate",
+                    "poDate": "2025-10-28"
+                }
+            ],
+            "_poItems": [
+                {
+                    "productName": "ALL KLEAN - 1LTR",
+                    "quantity": 3,
+                    "rate": 86.40,
+                    "amount": 259.20
+                },
+                {
+                    "productName": "Safety Helmet",
+                    "quantity": 2,
+                    "rate": 401.00,
+                    "amount": 802.00
+                }
+            ],
+            "_grnDetails": {
+                "items": [
+                    {
+                        "itemId": "PO-951432-0",
+                        "itemName": "ALL KLEAN - 1LTR",
+                        "orderedQuantity": 3,
+                        "receivedQuantity": 3,
+                        "isAccepted": true
+                    },
+                    {
+                        "itemId": "PO-951433-0",
+                        "itemName": "Safety Helmet",
+                        "orderedQuantity": 2,
+                        "receivedQuantity": 2,
+                        "isAccepted": true
+                    }
+                ],
+                "signedDc": "https://storage.cloud.com/grn-docs/signed-dc-by-site.pdf",
+                "comments": "All items received in good condition.",
+                "packagingImages": [
+                    "https://storage.cloud.com/grn-docs/package-img1.jpg"
+                ]
+            }
+        },
+        {
+            "invoiceId": "INV-XYZ790",
+            "invoiceNo": "INV-DEF-2025-102",
+            "invoiceDate": "2025-11-01T11:00:00.000Z",
+            "billAmount": 350.00,
+            "state": "South",
+            "billUrl": "https://storage.cloud.com/invoices/inv-def-102.pdf",
+            "status": "Pending",
+            "relatedPurchaseOrders": [
+                {
+                    "poNumber": "PO-951445",
+                    "materialRequestId": "IND/2025/50815",
+                    "siteName": "Chennai Site",
+                    "poDate": "2025-10-27"
+                }
+            ],
+            "_poItems": [
+                {
+                    "productName": "Safety Helmet",
+                    "quantity": 2,
+                    "rate": 350.00,
+                    "amount": 700.00
+                }
+            ],
+            "_grnDetails": {
+                "items": [
+                    {
+                        "itemId": "PO-951445-0",
+                        "itemName": "Safety Helmet",
+                        "orderedQuantity": 2,
+                        "receivedQuantity": 1,
+                        "isAccepted": true
+                    }
+                ],
+                "signedDc": "https://storage.cloud.com/grn-docs/signed-dc-by-site-2.pdf",
+                "comments": "Partial delivery received. One helmet missing.",
+                "packagingImages": []
+            }
+        }
+    ]
 }
-
-],
-
-"_poItems": [
-
-{ "productName": "ALL KLEAN - 1LTR", "quantity": 3, "rate": 86.40, "amount": 259.20 },
-
-{ "productName": "Safety Helmet", "quantity": 2, "rate": 401.00, "amount": 802.00 }
-
-],
-
-"_grnDetails": {
-
-"items": [
-
-{ "itemId": "PO-951432-0", "itemName": "ALL KLEAN - 1LTR", "orderedQuantity": 3, "receivedQuantity": 3, "isAccepted": true },
-
-{ "itemId": "PO-951433-0", "itemName": "Safety Helmet", "orderedQuantity": 2, "receivedQuantity": 2, "isAccepted": true }
-
-],
-
-"signedDc": "https://storage.cloud.com/grn-docs/signed-dc-by-site.pdf",
-
-"comments": "All items received in good condition.",
-
-"packagingImages": [
-
-"https://storage.cloud.com/grn-docs/package-img1.jpg"
-
-]
-
-}
-
-},
-
-{
-
-"invoiceId": "INV-XYZ790",
-
-"invoiceNo": "INV-DEF-2025-102",
-
-"invoiceDate": "2025-11-01T11:00:00.000Z",
-
-"billAmount": 350.00,
-
-"state": "South",
-
-"billUrl": "https://storage.cloud.com/invoices/inv-def-102.pdf",
-
-"status": "Pending",
-
-"relatedPurchaseOrders": [
-
-{
-
-"poNumber": "PO-951445",
-
-"materialRequestId": "IND/2025/50815",
-
-"siteName": "Chennai Site",
-
-"poDate": "2025-10-27"
-
-}
-
-],
-
-"_poItems": [
-
-{ "productName": "Safety Helmet", "quantity": 2, "rate": 350.00, "amount": 700.00 }
-
-],
-
-"_grnDetails": {
-
-"items": [
-
-{ "itemId": "PO-951445-0", "itemName": "Safety Helmet", "orderedQuantity": 2, "receivedQuantity": 1, "isAccepted": true }
-
-],
-
-"signedDc": "https://storage.cloud.com/grn-docs/signed-dc-by-site-2.pdf",
-
-"comments": "Partial delivery received. One helmet missing.",
-
-"packagingImages": []
-
-}
-
-}
-
-]
-
-}
+```
 
 **2. API to Approve Invoices**
 
@@ -1898,11 +1666,14 @@ This endpoint remains the same as it operates on invoiceIds, which are unique.
 - **Authorization:** **Procurement Head** role required.
 - **Request Body (JSON):**
 
+```json
 {
-
-"invoiceIds": ["INV-XYZ789", "INV-XYZ790"]
-
+    "invoiceIds": [
+        "INV-XYZ789",
+        "INV-XYZ790"
+    ]
 }
+```
 
 **3. API to Reject an Invoice**
 
@@ -1912,11 +1683,11 @@ This endpoint also remains the same, as it targets a single, unique invoiceId.
 - **Authorization:** **Procurement Head** role required.
 - **Request Body (JSON):**
 
+```json
 {
-
-"reason": "Invoice amount (₹350.00) does not match GRN value (₹700.00) due to partial delivery. Please submit a revised invoice."
-
+    "reason": "Invoice amount (₹350.00) does not match GRN value (₹700.00) due to partial delivery. Please submit a revised invoice."
 }
+```
 
 # 14. API Specification: Extra Material Request Flow
 
@@ -1937,34 +1708,29 @@ A JSON object indicating the current status of the permission for the selected s
 
 - **Scenario A: No request exists, or the existing one is rejected or closed.**
     - The frontend will display the request form (ExtraMaterialRequestPage).
-
+```json
 {
-
-"status": "none"
-
+    "status": "none"
 }
+```
 
 - **Scenario B: A request has been submitted and is awaiting RM approval.**
     - The frontend will display the "Pending Approval" message.
-
+```json
 {
-
-"status": "pending",
-
-"requestId": "EMR-2025-101"
-
+    "status": "pending",
+    "requestId": "EMR-2025-101"
 }
+```
 
 - **Scenario C: The RM has approved the request, and ordering is now allowed.**
     - The frontend will display the product catalog (ExtraMaterialOrderSheet).
-
+```json
 {
-
-"status": "approved",
-
-"requestId": "EMR-2025-101"
-
+    "status": "approved",
+    "requestId": "EMR-2025-101"
 }
+```
 
 **2. API to Create an Extra Material Permission Request**
 
@@ -1985,16 +1751,13 @@ The monthYear should be sent as a standardized string (e.g., ISO format) that 
 |reason|String|Yes|The justification for needing extra materials.|
 
 **Example Payload**
-
+```json
 {
-
-"siteId": "siteC",
-
-"monthYear": "2025-11-01T00:00:00.000Z",
-
-"reason": "Urgent plumbing repairs are required after an unexpected pipeline burst in the main facility."
-
+    "siteId": "siteC",
+    "monthYear": "2025-11-01T00:00:00.000Z",
+    "reason": "Urgent plumbing repairs are required after an unexpected pipeline burst in the main facility."
 }
+```
 
 # 15. API Specification: Extra Material Permission Approval
 
@@ -2011,52 +1774,35 @@ This is the primary API that populates the table with all extra material permiss
     - page (number, optional): For pagination.
 
 A JSON object with pagination information and an array of ExtraMaterialRequest objects.
-
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 1, "totalItems": 3 },
-
-"requests": [
-
-{
-
-"requestId": "EMR-2025-102",
-
-"siteName": "siteC",
-
-"monthYear": "November 2025",
-
-"reason": "Urgent plumbing repairs are required after an unexpected pipeline burst in the main facility.",
-
-"requesterName": "Anjali Sharma",
-
-"requestDate": "2025-10-31T10:00:00.000Z",
-
-"status": "pending"
-
-},
-
-{
-
-"requestId": "EMR-2025-103",
-
-"siteName": "siteA",
-
-"monthYear": "November 2025",
-
-"reason": "Additional safety equipment needed for a short-term construction project.",
-
-"requesterName": "Rohan Mehra",
-
-"requestDate": "2025-10-31T11:30:00.000Z",
-
-"status": "pending"
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 1,
+        "totalItems": 3
+    },
+    "requests": [
+        {
+            "requestId": "EMR-2025-102",
+            "siteName": "siteC",
+            "monthYear": "November 2025",
+            "reason": "Urgent plumbing repairs are required after an unexpected pipeline burst in the main facility.",
+            "requesterName": "Anjali Sharma",
+            "requestDate": "2025-10-31T10:00:00.000Z",
+            "status": "pending"
+        },
+        {
+            "requestId": "EMR-2025-103",
+            "siteName": "siteA",
+            "monthYear": "November 2025",
+            "reason": "Additional safety equipment needed for a short-term construction project.",
+            "requesterName": "Rohan Mehra",
+            "requestDate": "2025-10-31T11:30:00.000Z",
+            "status": "pending"
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **2. API to Approve Permission Requests**
 
@@ -2064,12 +1810,14 @@ This endpoint handles both single and bulk approvals, changing the status of the
 
 - **Endpoint:** POST /api/extra-material-requests/approve
 - **Authorization:** **Regional Manager** role required.
-
+```json
 {
-
-"requestIds": ["EMR-2025-102", "EMR-2025-103"]
-
+    "requestIds": [
+        "EMR-2025-102",
+        "EMR-2025-103"
+    ]
 }
+```
 
 **3. API to Reject a Permission Request**
 
@@ -2080,11 +1828,11 @@ This endpoint handles the rejection of a single permission request and requires 
 - **URL Parameter:**
     - {requestId} (string, required): The ID of the permission request to reject.
 
+```json
 {
-
-"reason": "This requirement should be covered by the standard site budget. Please raise a regular indent."
-
+    "reason": "This requirement should be covered by the standard site budget. Please raise a regular indent."
 }
+```
 
 **4. API to Fetch Site Indent History**
 
@@ -2101,45 +1849,28 @@ GET /api/sites/siteC/indent-history?month=2025-11
 
 An array of Indent summary objects for the specified site and month.
 
+```json
 [
-
-{
-
-"trackingNo": "IND/2025/50755",
-
-"category": "Regular",
-
-"value": 3450.00,
-
-"status": "PO_CREATED",
-
-"siteName": "siteC",
-
-"monthYear": "November 2025",
-
-"siteBudget": 20000.00
-
-},
-
-{
-
-"trackingNo": "IND/2025/50761",
-
-"category": "Extra Material",
-
-"value": 8500.00,
-
-"status": "REJECTED_BY_PH",
-
-"siteName": "siteC",
-
-"monthYear": "November 2025",
-
-"siteBudget": 20000.00
-
-}
-
+    {
+        "trackingNo": "IND/2025/50755",
+        "category": "Regular",
+        "value": 3450.00,
+        "status": "PO_CREATED",
+        "siteName": "siteC",
+        "monthYear": "November 2025",
+        "siteBudget": 20000.00
+    },
+    {
+        "trackingNo": "IND/2025/50761",
+        "category": "Extra Material",
+        "value": 8500.00,
+        "status": "REJECTED_BY_PH",
+        "siteName": "siteC",
+        "monthYear": "November 2025",
+        "siteBudget": 20000.00
+    }
 ]
+```
 
 # 16. API Specification: Extra Material Order Sheet Data
 
@@ -2157,117 +1888,82 @@ This is the sole API for this component. It is called when the ExtraMaterialOrd
 
 A JSON object containing the dynamic filter options (categories and brands) and the complete array of Product objects.
 
+```json
 {
-
-"filterOptions": {
-
-"categories": [
-
-{ "value": "Fragrance", "label": "Fragrance" },
-
-{ "value": "Soap - Liquid", "label": "Soap - Liquid" },
-
-{ "value": "Safety Gear", "label": "Safety Gear" }
-
-],
-
-"brands": [
-
-{ "value": "LOCAL", "label": "LOCAL" },
-
-{ "value": "HUL", "label": "HUL" },
-
-{ "value": "SafetyFirst", "label": "SafetyFirst" }
-
-]
-
-},
-
-"products": [
-
-{
-
-"periodFrom": "22-Oct-24",
-
-"vendorName": "MOPSHOP DISTRIBUTION PRIVATE LIMITED",
-
-"productCode": "P03386",
-
-"productName": "AIR DIFISUER MACHINE LOCAL - MS",
-
-"landedPrice": 1740,
-
-"manufacturedBy": "LOCAL",
-
-"brandName": "LOCAL",
-
-"hsnCode": "3925",
-
-"packaging": "NOS",
-
-"usedFor": "General",
-
-"category": "Fragrance",
-
-"lifeCycleDays": 365,
-
-"costOfTransportationPerKM": 3,
-
-"orderLeadTimeDays": 10,
-
-"deliveryBy": "Direct to site by Vendor - Delivery per km",
-
-"netProductCostPerDay": 4.77,
-
-"gstSetOffAvailable": true,
-
-"financeTreatment": "Depriciate"
-
-},
-
-{
-
-"periodFrom": "22-Oct-24",
-
-"vendorName": "MOPSHOP DISTRIBUTION PRIVATE LIMITED",
-
-"productCode": "P03387",
-
-"productName": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
-
-"landedPrice": 94.8,
-
-"manufacturedBy": "HUL",
-
-"brandName": "HUL",
-
-"hsnCode": "3402",
-
-"packaging": "NOS",
-
-"usedFor": "",
-
-"category": "Soap - Liquid",
-
-"lifeCycleDays": 30,
-
-"costOfTransportationPerKM": 3,
-
-"orderLeadTimeDays": 10,
-
-"deliveryBy": "Direct to site by Vendor - Delivery per km",
-
-"netProductCostPerDay": 3.16,
-
-"gstSetOffAvailable": true,
-
-"financeTreatment": "Depriciate"
-
+    "filterOptions": {
+        "categories": [
+            {
+                "value": "Fragrance",
+                "label": "Fragrance"
+            },
+            {
+                "value": "Soap - Liquid",
+                "label": "Soap - Liquid"
+            },
+            {
+                "value": "Safety Gear",
+                "label": "Safety Gear"
+            }
+        ],
+        "brands": [
+            {
+                "value": "LOCAL",
+                "label": "LOCAL"
+            },
+            {
+                "value": "HUL",
+                "label": "HUL"
+            },
+            {
+                "value": "SafetyFirst",
+                "label": "SafetyFirst"
+            }
+        ]
+    },
+    "products": [
+        {
+            "periodFrom": "22-Oct-24",
+            "vendorName": "MOPSHOP DISTRIBUTION PRIVATE LIMITED",
+            "productCode": "P03386",
+            "productName": "AIR DIFISUER MACHINE LOCAL - MS",
+            "landedPrice": 1740,
+            "manufacturedBy": "LOCAL",
+            "brandName": "LOCAL",
+            "hsnCode": "3925",
+            "packaging": "NOS",
+            "usedFor": "General",
+            "category": "Fragrance",
+            "lifeCycleDays": 365,
+            "costOfTransportationPerKM": 3,
+            "orderLeadTimeDays": 10,
+            "deliveryBy": "Direct to site by Vendor - Delivery per km",
+            "netProductCostPerDay": 4.77,
+            "gstSetOffAvailable": true,
+            "financeTreatment": "Depriciate"
+        },
+        {
+            "periodFrom": "22-Oct-24",
+            "vendorName": "MOPSHOP DISTRIBUTION PRIVATE LIMITED",
+            "productCode": "P03387",
+            "productName": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
+            "landedPrice": 94.8,
+            "manufacturedBy": "HUL",
+            "brandName": "HUL",
+            "hsnCode": "3402",
+            "packaging": "NOS",
+            "usedFor": "",
+            "category": "Soap - Liquid",
+            "lifeCycleDays": 30,
+            "costOfTransportationPerKM": 3,
+            "orderLeadTimeDays": 10,
+            "deliveryBy": "Direct to site by Vendor - Delivery per km",
+            "netProductCostPerDay": 3.16,
+            "gstSetOffAvailable": true,
+            "financeTreatment": "Depriciate"
+        }
+    ]
 }
-
-]
-
-}
+```
 
 # 17. API Specification: Regional Manager Indent Approval
 
@@ -2288,41 +1984,30 @@ This is the primary API that populates the main "Approval" tab with indents awai
 
 A JSON object with pagination and an array of ManagerIndent summaries. The status field will reflect the RM's queue.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 2, "totalItems": 18 },
-
-"indents": [
-
-{
-
-"trackingNo": "IND/2025/50815",
-
-"monthYear": "November 2025",
-
-"requestDate": "2025-11-01",
-
-"siteName": "siteC",
-
-"branchName": "DUMMY BRANCH",
-
-"category": "Extra Material",
-
-"requestCategory": "Chargeable",
-
-"siteBudget": 20000.00,
-
-"value": 8500.00,
-
-"balance": 11500.00,
-
-"status": "PENDING_RM_APPROVAL"
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 2,
+        "totalItems": 18
+    },
+    "indents": [
+        {
+            "trackingNo": "IND/2025/50815",
+            "monthYear": "November 2025",
+            "requestDate": "2025-11-01",
+            "siteName": "siteC",
+            "branchName": "DUMMY BRANCH",
+            "category": "Extra Material",
+            "requestCategory": "Chargeable",
+            "siteBudget": 20000.00,
+            "value": 8500.00,
+            "balance": 11500.00,
+            "status": "PENDING_RM_APPROVAL"
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **2. API to Fetch Full Indent Details (for View/Edit Modals)**
 
@@ -2352,17 +2037,14 @@ This is the core approval action for the RM. Upon success, the indent is moved t
 
 _(This supports single or bulk approval, just like the PH's page)_
 
+```json
 {
-
-"indentIds": [
-
-"IND/2025/50815",
-
-"IND/2025/50816"
-
-]
-
+    "indentIds": [
+        "IND/2025/50815",
+        "IND/2025/50816"
+    ]
 }
+```
 
 **5. API to Reject an Indent (RM Step)**
 
@@ -2375,11 +2057,11 @@ Handles the rejection of a single indent by the RM.
 
 **Request Body (JSON)**
 
+```json
 {
-
-"reason": "This expenditure was not pre-approved in the quarterly planning. Please provide more justification."
-
+    "reason": "This expenditure was not pre-approved in the quarterly planning. Please provide more justification."
 }
+```
 
 **6. API to Fetch Site Order History**
 
@@ -2437,41 +2119,26 @@ A complete request is a single multipart/form-data submission. Below are the p
 
 - **Part 1: data (JSON String)**
 
+```json
 {
-
-"siteId": "Site B",
-
-"forTheMonth": "2025-11-01T00:00:00.000Z",
-
-"vendorName": "Local Hardware Store",
-
-"gstNo": "27ABCDE1234F1Z5",
-
-"products": [
-
-{
-
-"productName": "Emergency LED Bulbs",
-
-"quantity": 10,
-
-"cost": 150
-
-},
-
-{
-
-"productName": "Extension Cord (5m)",
-
-"quantity": 2,
-
-"cost": 300
-
+    "siteId": "Site B",
+    "forTheMonth": "2025-11-01T00:00:00.000Z",
+    "vendorName": "Local Hardware Store",
+    "gstNo": "27ABCDE1234F1Z5",
+    "products": [
+        {
+            "productName": "Emergency LED Bulbs",
+            "quantity": 10,
+            "cost": 150
+        },
+        {
+            "productName": "Extension Cord (5m)",
+            "quantity": 2,
+            "cost": 300
+        }
+    ]
 }
-
-]
-
-}
+```
 
 - **Part 2: billUpload (File)**
     - Content-Type: application/pdf
@@ -2496,77 +2163,60 @@ This is the primary API that populates the main table with all cash purchase req
 
 A JSON object with pagination information and an array of CashPurchaseApprovalItem objects. The list view contains all necessary data, including the nested products array.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 3, "totalItems": 28 },
-
-"purchases": [
-
-{
-
-"purchaseId": "CP-2025-5487",
-
-"requesterName": "Anjali Sharma",
-
-"requestDate": "2025-11-01",
-
-"forTheMonth": "November 2025",
-
-"site": "Site B",
-
-"vendorName": "Local Hardware Store",
-
-"gstNo": "27ABCDE1234F1Z5",
-
-"billUrl": "https://storage.cloud.com/cash-bills/bill-5487.pdf",
-
-"products": [
-
-{ "productName": "Emergency LED Bulbs", "stock": 10, "cost": 150 },
-
-{ "productName": "Extension Cord (5m)", "stock": 2, "cost": 300 }
-
-],
-
-"totalValue": 2100.00,
-
-"status": "Pending"
-
-},
-
-{
-
-"purchaseId": "CP-2025-5488",
-
-"requesterName": "Rohan Mehra",
-
-"requestDate": "2025-11-02",
-
-"forTheMonth": "November 2025",
-
-"site": "Site A",
-
-"vendorName": "Quick Office Solutions",
-
-"gstNo": null,
-
-"billUrl": "https://storage.cloud.com/cash-bills/bill-5488.jpg",
-
-"products": [
-
-{ "productName": "Whiteboard Markers (Pack of 4)", "stock": 5, "cost": 120 }
-
-],
-
-"totalValue": 600.00,
-
-"status": "Pending"
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 3,
+        "totalItems": 28
+    },
+    "purchases": [
+        {
+            "purchaseId": "CP-2025-5487",
+            "requesterName": "Anjali Sharma",
+            "requestDate": "2025-11-01",
+            "forTheMonth": "November 2025",
+            "site": "Site B",
+            "vendorName": "Local Hardware Store",
+            "gstNo": "27ABCDE1234F1Z5",
+            "billUrl": "https://storage.cloud.com/cash-bills/bill-5487.pdf",
+            "products": [
+                {
+                    "productName": "Emergency LED Bulbs",
+                    "stock": 10,
+                    "cost": 150
+                },
+                {
+                    "productName": "Extension Cord (5m)",
+                    "stock": 2,
+                    "cost": 300
+                }
+            ],
+            "totalValue": 2100.00,
+            "status": "Pending"
+        },
+        {
+            "purchaseId": "CP-2025-5488",
+            "requesterName": "Rohan Mehra",
+            "requestDate": "2025-11-02",
+            "forTheMonth": "November 2025",
+            "site": "Site A",
+            "vendorName": "Quick Office Solutions",
+            "gstNo": null,
+            "billUrl": "https://storage.cloud.com/cash-bills/bill-5488.jpg",
+            "products": [
+                {
+                    "productName": "Whiteboard Markers (Pack of 4)",
+                    "stock": 5,
+                    "cost": 120
+                }
+            ],
+            "totalValue": 600.00,
+            "status": "Pending"
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **2. API to Approve Cash Purchases**
 
@@ -2577,11 +2227,14 @@ This endpoint handles both single and bulk approvals.
 
 **Example Payload**
 
+```json
 {
-
-"purchaseIds": ["CP-2025-5487", "CP-2025-5488"]
-
+    "purchaseIds": [
+        "CP-2025-5487",
+        "CP-2025-5488"
+    ]
 }
+```
 
 **3. API to Reject a Cash Purchase**
 
@@ -2594,11 +2247,11 @@ This endpoint handles the rejection of a single cash purchase and requires a rea
 
 **Example Payload**
 
+```json
 {
-
-"reason": "This purchase exceeds the petty cash limit for the site. Please follow the standard procurement process."
-
+    "reason": "This purchase exceeds the petty cash limit for the site. Please follow the standard procurement process."
 }
+```
 
 # 20. API Specification: Bulk Product Upload
 
@@ -2661,43 +2314,31 @@ This is the core endpoint where the vendor submits their filled-out template. Th
 
 **Success Response (200 OK)**
 
+```json
 {
-
-"message": "File processed successfully. 52 products have been submitted for approval."
-
+    "message": "File processed successfully. 52 products have been submitted for approval."
 }
+```
 
 **Error Response (400 Bad Request)**
 
+```json
 {
-
-"message": "File validation failed. Found 2 errors. Please correct the file and re-upload.",
-
-"errors": [
-
-{
-
-"rowIndex": 5,
-
-"productName": "Faulty Widget",
-
-"error": "Price must be a positive number."
-
-},
-
-{
-
-"rowIndex": 8,
-
-"productName": "Another Item",
-
-"error": "HSN Code must be exactly 4 digits."
-
+    "message": "File validation failed. Found 2 errors. Please correct the file and re-upload.",
+    "errors": [
+        {
+            "rowIndex": 5,
+            "productName": "Faulty Widget",
+            "error": "Price must be a positive number."
+        },
+        {
+            "rowIndex": 8,
+            "productName": "Another Item",
+            "error": "HSN Code must be exactly 4 digits."
+        }
+    ]
 }
-
-]
-
-}
+```
 
 # 21. API Specification: Vendor Product Management
 

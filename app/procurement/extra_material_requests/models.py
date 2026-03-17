@@ -1,8 +1,6 @@
-import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import String, DateTime, Index
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -11,7 +9,7 @@ from app.database import Base
 class ProcExtraMaterialRequest(Base):
     __tablename__ = "proc_extra_material_requests"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    emr_id: Mapped[str] = mapped_column(String(50), primary_key=True)
     site_id: Mapped[str] = mapped_column(String(100), nullable=False)
     requestor_email: Mapped[str] = mapped_column(String(255), nullable=False)
     month_year: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

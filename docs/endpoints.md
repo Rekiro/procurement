@@ -50,10 +50,10 @@
 | GET | /api/procurement/products | any auth | ✅ | ✅ | `?status=&search=&page=1&limit=10`. Response: `{pagination, products}` |
 | POST | /api/procurement/products/approve | any auth | ✅ | ✅ | Body: `{productIds: ["PRD0000001"]}` (product codes, not UUIDs) |
 | POST | /api/procurement/products/{productCode}/reject | any auth | ✅ | ✅ | Body: `{reason}` (not rejectionReason) |
-| GET | /api/procurement/products/catalog | any auth | ✅ | ✅ | Only Approved products |
+| GET | /api/procurement/products/catalog | any auth | ✅ | — | Returns `{filterOptions: {categories, brands}, products[CatalogProduct]}`. Only Approved products, joined with vendor name |
 | GET | /api/procurement/vendor/products | any auth | ✅ | ✅ | `?vendor_code=VEN0000001` |
 | DELETE | /api/procurement/products/{productCode} | any auth | ✅ | ✅ | `?vendor_code=VEN0000001` |
-| GET | /api/procurement/products/bulk-upload-template | any auth | ✅ | ✅ | Excel template download |
+| GET | /api/procurement/products/bulk-upload-template | any auth | ✅ | ✅ | EP55: Excel template — display-name headers (Product Name, Category, etc.) |
 | POST | /api/procurement/products/bulk-upload | any auth | ✅ | ✅ | `?vendor_code=VEN0000001`. Upload Excel to batch create products |
 | POST | /api/procurement/products/price-change-requests | any auth | ✅ | ✅ | Body: `{productCode, vendorCode, newPrice, wefDate}` |
 | GET | /api/procurement/products/price-change-requests | any auth | ✅ | ✅ | List all pending requests |
@@ -72,7 +72,7 @@
 | GET | /api/procurement/user-sites | any auth | ✅ | ✅ | Returns all sites (no user-site assignment table yet) |
 | GET | /api/procurement/sites/{siteId}/material-catalog | any auth | ✅ | ✅ | All Approved products from proc_products (not site-specific yet) |
 | GET | /api/procurement/sites/{siteId}/history | any auth | ✅ | ✅ | Indent history for site (spec #8.6). `?month=2025-09`. Response: `[{siteId, trackingNo, requestDate, siteBudget, value, status, balance}]` |
-| GET | /api/procurement/sites/{siteId}/indent-history | any auth | ✅ | ✅ | Indents for site from proc_indents |
+| GET | /api/procurement/sites/{siteId}/indent-history | any auth | ✅ | — | `?month=YYYY-MM` (required). Response: `[{trackingNo, category, value, status, siteName, monthYear, siteBudget}]` |
 | GET | /api/procurement/sites/options | any auth | ✅ | ✅ | Dropdown: `{siteId, siteName, city, state}` from commercial `sites` table |
 
 ---
@@ -81,11 +81,11 @@
 
 | Method | Path | Role | Status | Test | Notes |
 |---|---|---|---|---|---|
-| GET | /api/procurement/extra-material-requests/status | requestor | ✅ | ✅ | Query param: `?siteId=`. Returns `hasApproval` + `requestId` |
-| POST | /api/procurement/extra-material-requests | requestor | ✅ | ✅ | `monthYear`: "YYYY-MM" format. One per requestor+site+month |
-| GET | /api/procurement/extra-material-requests | regional_manager | ✅ | ✅ | Optional `?status=` filter (pending/approved/rejected) |
-| POST | /api/procurement/extra-material-requests/approve | regional_manager | ✅ | ✅ | Body: `{requestId}` |
-| POST | /api/procurement/extra-material-requests/{requestId}/reject | regional_manager | ✅ | ✅ | Body: `{rejectionReason}` |
+| GET | /api/procurement/extra-material-requests/status | any auth | ✅ | — | Query: `?siteId=&requestorEmail=`. Returns `{status: none\|pending\|approved, requestId?}` for current month |
+| POST | /api/procurement/extra-material-requests | any auth | ✅ | — | Body: `{siteId, monthYear (ISO), reason, requestorEmail}`. Auto-generates `EMR-YYYY-NNN`. One per requestor+site+month |
+| GET | /api/procurement/extra-material-requests | any auth | ✅ | — | `?status=&page=1&limit=10`. Response: `{pagination, requests[{requestId, siteName, monthYear (human), reason, requesterName, requestDate, status}]}` |
+| POST | /api/procurement/extra-material-requests/approve | any auth | ✅ | — | Body: `{requestIds: [str]}`. Bulk approve. |
+| POST | /api/procurement/extra-material-requests/{requestId}/reject | any auth | ✅ | — | Path: string `EMR-YYYY-NNN`. Body: `{reason}` |
 
 ---
 
@@ -94,7 +94,7 @@
 | Method | Path | Role | Status | Test | Notes |
 |---|---|---|---|---|---|
 | POST | /api/procurement/indents | any auth | ✅ | ✅ | Body: `{requestorEmail, siteId, forMonth, isMonthly, category, items[{productCode, quantity}]}`. Prices looked up from DB. Tracking: `IND/YYYY/NNNNN`. Regular→PENDING_PH_APPROVAL, Extra Material→PENDING_RM_APPROVAL (closes EMR). Response: `{message, trackingNo, status}` |
-| GET | /api/procurement/indents | any auth | ✅ | ✅ | `?status=&search=&page=1&limit=10`. Response: `{pagination, indents}` with IndentListItem schema |
+| GET | /api/procurement/indents | any auth | ✅ | — | `?status=` (required) `&search=&page=1&limit=10`. PH: `PENDING_PH_APPROVAL`, RM: `PENDING_RM_APPROVAL`. Response: `{pagination, indents}` |
 | GET | /api/procurement/indents/my-indents | any auth | ✅ | ✅ | `?requestor_email=` (not from JWT) |
 | POST | /api/procurement/indents/approve | any auth | ✅ | ✅ | Body: `{indentIds: ["IND/2026/00001"]}` (bulk, trackingNos). RM→PENDING_PH, PH→PO_CREATED (auto-creates POs grouped by vendor). Response includes `poNumbers` |
 | GET | /api/procurement/indents/{trackingNo} | any auth | ✅ | ✅ | Path param is trackingNo (slashes OK via :path). Rich detail with products, totals, tax |
@@ -107,9 +107,9 @@
 
 | Method | Path | Role | Status | Test | Notes |
 |---|---|---|---|---|---|
-| GET | /api/procurement/purchase-orders | any auth | ✅ | ✅ | `?search=&page=1&limit=10`. Response includes dcNumber, dcDate, signedDcISmartUrl (PH view fields) |
-| GET | /api/procurement/purchase-orders/export | any auth | ✅ | ✅ | `?search=` optional filter. Excel export matches list view filtering |
-| GET | /api/procurement/purchase-orders/{poNumber}/download | any auth | ✅ | — | `?type=po_pdf|po_excel|dc_pdf`. `po_excel` implemented; `po_pdf`/`dc_pdf` return 501 (needs PDF library) |
+| GET | /api/procurement/purchase-orders | any auth | ✅ | ✅ | `?search=&page=1&limit=10&vendorCode=&requestorEmail=&status=&state=`. Vendor view: adds grnDetails, invoiceDetails, _indentDetailsPayload (w/ landedPrice), availableStates. Requestor view: adds _indentDetailsPayload (indent items). Status=GRN_SUBMITTED filters for invoice creation. |
+| GET | /api/procurement/purchase-orders/export | any auth | ✅ | ✅ | `?search=&vendorCode=&requestorEmail=` optional filters. Dynamic filename: `Purchase_Orders_YYYY-MM-DD.xlsx` |
+| GET | /api/procurement/purchase-orders/{poNumber}/download | any auth | ✅ | — | `?type=po_pdf\|po_excel\|dc_pdf`. `po_excel` implemented; `po_pdf`/`dc_pdf` return 501 (needs PDF library) |
 | PUT | /api/procurement/purchase-orders/{poNumber} | any auth | ✅ | — | **multipart/form-data**: `data` JSON (deliveryType, courierName, podNumber, status, dateOfDelivery, reason) + files (podImage, signedPod, signedDc). Delivered requires all files+fields. Courier requires courierName. Out-of-TAT requires reason |
 | POST | /api/procurement/purchase-orders/{poNumber}/grn | any auth | ✅ | — | **multipart/form-data**: `data` JSON (items, predefinedComment, comments, requestorEmail) + signedDc (required) + photos (up to 2). Sets PO → `GRN_SUBMITTED`. Backend looks up item names/ordered qty from PO items |
 
@@ -119,10 +119,10 @@
 
 | Method | Path | Role | Status | Test | Notes |
 |---|---|---|---|---|---|
-| POST | /api/procurement/invoices | any auth | ✅ | ✅ | Body: `{invoiceNo, invoiceType, state, billAmount, billUrl, poNumbers[]}`. Auto-generates `INV-NNNNNN`. Sets linked POs → `INVOICE_SUBMITTED` |
-| GET | /api/procurement/invoices | any auth | ✅ | ✅ | Optional `?status=` filter (Pending/Approved/Rejected) |
-| POST | /api/procurement/invoices/approve | any auth | ✅ | ✅ | Body: `{invoiceId}` (UUID) |
-| POST | /api/procurement/invoices/{invoiceId}/reject | any auth | ✅ | ✅ | Path: UUID. Body: `{rejectionReason}` |
+| POST | /api/procurement/invoices | any auth | ✅ | — | **multipart/form-data**: `data` JSON (poNumbers, invoiceNo, state, billAmount) + `billUpload` file. Validates billAmount vs GRN totals (receivedQty × landedPrice). Auto-generates `INV0000001`. Sets linked POs → `INVOICE_SUBMITTED` |
+| GET | /api/procurement/invoices | any auth | ✅ | — | `?status=&search=&site=&state=&vendorCode=&page=1&limit=10`. Response: `{pagination, filterOptions{sites,states}, invoices[{invoiceId,invoiceNo,invoiceDate,billAmount,state,billUrl,status,reason,relatedPurchaseOrders,_poItems,_grnDetails}]}` |
+| POST | /api/procurement/invoices/approve | any auth | ✅ | — | Body: `{invoiceIds: [str]}`. Bulk approve. |
+| POST | /api/procurement/invoices/{invoiceId}/reject | any auth | ✅ | — | Path: string invoice ID (e.g. `INV0000001`). Body: `{reason}` |
 
 ---
 
@@ -130,10 +130,10 @@
 
 | Method | Path | Role | Status | Test | Notes |
 |---|---|---|---|---|---|
-| POST | /api/procurement/cash-purchases | any auth | ✅ | ✅ | Body: `{siteId, forTheMonth (YYYY-MM), vendorName?, gstNo?, products[], totalCost, billUrl}`. Auto-generates `CP-NNNNNN` |
-| GET | /api/procurement/cash-purchases | any auth | ✅ | ✅ | Optional `?status=` filter (Pending/Approved/Rejected) |
-| POST | /api/procurement/cash-purchases/approve | any auth | ✅ | ✅ | Body: `{purchaseId}` (UUID) |
-| POST | /api/procurement/cash-purchases/{purchaseId}/reject | any auth | ✅ | ✅ | Path: UUID. Body: `{rejectionReason}` |
+| POST | /api/procurement/cash-purchases | any auth | ✅ | — | EP51: multipart/form-data (`data` JSON + `billUpload` file). `requestorEmail` in data. totalCost computed from products. ID format `CP{N:07d}` |
+| GET | /api/procurement/cash-purchases | any auth | ✅ | — | EP52: `?status=&search=&page=1&limit=10`. Response: `{pagination, purchases[...]}`. Joined with Site name |
+| POST | /api/procurement/cash-purchases/approve | any auth | ✅ | — | EP53: Body: `{purchaseIds: ["CP0000001"]}` (bulk, business IDs) |
+| POST | /api/procurement/cash-purchases/{purchaseId}/reject | any auth | ✅ | — | EP54: Path: business ID string. Body: `{reason}` |
 
 ---
 

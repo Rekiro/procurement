@@ -61,16 +61,7 @@ async def create_indent(db: AsyncSession, data: IndentCreate) -> ProcIndent:
                 detail="extraMaterialRequestId is required for Extra Material indents",
             )
 
-        # EMR still uses UUID PK (business IDs added in a later batch)
-        try:
-            emr_id = uuid.UUID(data.extraMaterialRequestId)
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid extraMaterialRequestId format",
-            )
-
-        emr = await db.get(ProcExtraMaterialRequest, emr_id)
+        emr = await db.get(ProcExtraMaterialRequest, data.extraMaterialRequestId)
         if not emr:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -106,9 +97,7 @@ async def create_indent(db: AsyncSession, data: IndentCreate) -> ProcIndent:
         for_month=data.forMonth,
         is_monthly=data.isMonthly,
         category=data.category,
-        extra_material_request_id=(
-            uuid.UUID(data.extraMaterialRequestId) if data.extraMaterialRequestId else None
-        ),
+        emr_id=data.extraMaterialRequestId or None,
         total_value=total_value,
         status=initial_status,
     )

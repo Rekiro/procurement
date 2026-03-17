@@ -1,8 +1,7 @@
-import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import String, DateTime, Numeric
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -11,8 +10,7 @@ from app.database import Base
 class ProcCashPurchase(Base):
     __tablename__ = "proc_cash_purchases"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    purchase_id: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    purchase_id: Mapped[str] = mapped_column(String(50), primary_key=True)
     requestor_email: Mapped[str] = mapped_column(String(255), nullable=False)
     site_id: Mapped[str] = mapped_column(String(100), nullable=False)
     for_the_month: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

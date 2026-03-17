@@ -27,12 +27,19 @@ async def get_po_with_items(db: AsyncSession, po_number: str):
 
 
 async def list_purchase_orders(
-    db: AsyncSession, search: str | None = None, vendor_code: str | None = None,
+    db: AsyncSession,
+    search: str | None = None,
+    vendor_code: str | None = None,
+    requestor_email: str | None = None,
 ):
     """Flat list used by export."""
     q = select(ProcPurchaseOrder).order_by(ProcPurchaseOrder.created_at.desc())
     if vendor_code:
         q = q.where(ProcPurchaseOrder.vendor_code == vendor_code)
+    if requestor_email:
+        q = q.join(ProcIndent, ProcPurchaseOrder.indent_id == ProcIndent.id).where(
+            ProcIndent.requestor_email == requestor_email
+        )
     if search:
         term = f"%{search}%"
         q = q.where(
@@ -53,18 +60,24 @@ async def list_purchase_orders_paginated(
     limit: int = 10,
     vendor_code: str | None = None,
     requestor_email: str | None = None,
-) -> tuple[list[dict], dict]:
-    """Paginated PO list with site name and indent tracking_no joins.
+    status: str | None = None,
+    state: str | None = None,
+) -> tuple[list[dict], dict, list[str]]:
+    """Paginated PO list.
 
-    vendor_code: filter to POs belonging to this vendor.
-    requestor_email: filter to POs from indents created by this requestor;
-        also includes _indentDetailsPayload with items (needed for GRN form).
+    Returns (po_list, pagination, available_states).
+
+    vendor_code: filter + _indentDetailsPayload with PO items + grnDetails + invoiceDetails.
+    requestor_email: filter + _indentDetailsPayload with indent items.
+    status: filter by PO status (e.g. GRN_SUBMITTED).
+    state: filter by site state/region.
     """
     q = (
         select(
             ProcPurchaseOrder,
             ProcIndent.tracking_no.label("indent_tracking_no"),
             Site.location_name.label("site_name"),
+            Site.state.label("site_state"),
         )
         .outerjoin(ProcIndent, ProcPurchaseOrder.indent_id == ProcIndent.id)
         .outerjoin(Site, ProcPurchaseOrder.site_id == cast(Site.id, String))
@@ -75,6 +88,10 @@ async def list_purchase_orders_paginated(
         q = q.where(ProcPurchaseOrder.vendor_code == vendor_code)
     if requestor_email:
         q = q.where(ProcIndent.requestor_email == requestor_email)
+    if status:
+        q = q.where(ProcPurchaseOrder.status == status)
+    if state:
+        q = q.where(Site.state == state)
 
     if search:
         term = f"%{search}%"
@@ -101,18 +118,30 @@ async def list_purchase_orders_paginated(
             return d.strftime("%Y-%m-%d")
         return str(d)
 
-    # If requestor view, pre-load indent items for _indentDetailsPayload
+    # ── available_states (vendor view only, ignores state filter) ──
+    available_states: list[str] = []
+    if vendor_code:
+        from sqlalchemy import distinct as _distinct
+        states_q = (
+            select(_distinct(Site.state))
+            .join(ProcPurchaseOrder, cast(Site.id, String) == ProcPurchaseOrder.site_id)
+            .where(ProcPurchaseOrder.vendor_code == vendor_code)
+            .where(Site.state.isnot(None))
+        )
+        states_result = await db.execute(states_q)
+        available_states = sorted([r[0] for r in states_result.all() if r[0]])
+
+    # ── Requestor view: batch-load indent items ──
     indent_items_map: dict[str, list[dict]] = {}
     if requestor_email:
-        indent_ids = [po.indent_id for po, _, _ in rows if po.indent_id]
+        indent_ids = [po.indent_id for po, *_ in rows if po.indent_id]
         if indent_ids:
             from app.procurement.indents.models import ProcIndentItem
             items_result = await db.execute(
                 select(ProcIndentItem).where(ProcIndentItem.indent_id.in_(indent_ids))
             )
             for item in items_result.scalars().all():
-                key = str(item.indent_id)
-                indent_items_map.setdefault(key, []).append({
+                indent_items_map.setdefault(str(item.indent_id), []).append({
                     "productCode": item.product_code,
                     "productName": item.product_name,
                     "quantity": float(item.quantity),
@@ -120,12 +149,93 @@ async def list_purchase_orders_paginated(
                     "totalPrice": float(item.total_price),
                 })
 
+    # ── Batch-load PO items + indent metadata (all views) ──
+    po_items_map: dict[uuid.UUID, list] = {}
+    indent_meta_map: dict[str, dict] = {}
+    po_ids_list = [po.id for po, *_ in rows]
+    if po_ids_list:
+        pi_result = await db.execute(
+            select(ProcPoItem).where(ProcPoItem.po_id.in_(po_ids_list))
+        )
+        for item in pi_result.scalars().all():
+            po_items_map.setdefault(item.po_id, []).append(item)
+
+    indent_ids_all = [po.indent_id for po, *_ in rows if po.indent_id]
+    if indent_ids_all:
+        ind_result = await db.execute(
+            select(
+                ProcIndent.id,
+                ProcIndent.is_monthly,
+                ProcIndent.for_month,
+                ProcIndent.total_value,
+            ).where(ProcIndent.id.in_(indent_ids_all))
+        )
+        for row in ind_result.all():
+            indent_meta_map[str(row[0])] = {
+                "isMonthly": row[1],
+                "forMonth": row[2],
+                "totalValue": float(row[3]),
+            }
+
+    # ── GRN batch load (all views) ──
+    po_numbers_page = [po.po_number for po, *_ in rows]
+    grn_map: dict[str, ProcGrn] = {}
+    grn_items_map: dict[uuid.UUID, list] = {}
+    grn_photos_map: dict[uuid.UUID, list[str]] = {}
+    if po_numbers_page:
+        grns_result = await db.execute(
+            select(ProcGrn).where(ProcGrn.po_number.in_(po_numbers_page))
+        )
+        grns = list(grns_result.scalars().all())
+        for grn in grns:
+            grn_map[grn.po_number] = grn
+        if grns:
+            grn_ids = [grn.id for grn in grns]
+            gi_result = await db.execute(
+                select(ProcGrnItem).where(ProcGrnItem.grn_id.in_(grn_ids))
+            )
+            for gi in gi_result.scalars().all():
+                grn_items_map.setdefault(gi.grn_id, []).append(gi)
+            gp_result = await db.execute(
+                select(ProcGrnPhoto).where(ProcGrnPhoto.grn_id.in_(grn_ids))
+            )
+            for gp in gp_result.scalars().all():
+                grn_photos_map.setdefault(gp.grn_id, []).append(gp.photo_url)
+
+    # ── Invoice batch load (all views) ──
+    invoice_details_map: dict[str, dict | None] = {}
+    if po_numbers_page:
+        from app.procurement.invoices.models import ProcInvoice, ProcInvoicePoLink
+        lnk_result = await db.execute(
+            select(ProcInvoicePoLink).where(
+                ProcInvoicePoLink.po_number.in_(po_numbers_page)
+            )
+        )
+        lnks = list(lnk_result.scalars().all())
+        if lnks:
+            inv_uuids = list({lnk.invoice_id for lnk in lnks})
+            invs_result = await db.execute(
+                select(ProcInvoice).where(ProcInvoice.id.in_(inv_uuids))
+            )
+            inv_by_uuid = {inv.id: inv for inv in invs_result.scalars().all()}
+            for lnk in lnks:
+                inv = inv_by_uuid.get(lnk.invoice_id)
+                if inv:
+                    invoice_details_map[lnk.po_number] = {
+                        "invoiceId": inv.invoice_id,
+                        "invoiceNo": inv.invoice_no,
+                        "status": inv.status,
+                        "billAmount": float(inv.bill_amount),
+                        "billUrl": inv.bill_url,
+                    }
+
     po_list = []
-    for po, indent_tracking_no, site_name in rows:
+    for row in rows:
+        po, indent_tracking_no, site_name, site_state = row[0], row[1], row[2], row[3]
         po_dict = {
             "materialRequestId": indent_tracking_no,
             "siteName": site_name or po.site_id,
-            "region": None,
+            "region": site_state,
             "dcNumber": po.dc_number,
             "poNumber": po.po_number,
             "dcDate": _fmt_date(po.dc_date),
@@ -144,11 +254,56 @@ async def list_purchase_orders_paginated(
             "tatStatus": po.tat_status,
             "reason": po.reason,
         }
-        if requestor_email and po.indent_id:
-            po_dict["_indentDetailsPayload"] = {
-                "trackingNo": indent_tracking_no,
-                "items": indent_items_map.get(str(po.indent_id), []),
+
+        # _indentDetailsPayload (all views — requestor gets indent items, others get PO items)
+        if po.indent_id:
+            if requestor_email:
+                po_dict["_indentDetailsPayload"] = {
+                    "trackingNo": indent_tracking_no,
+                    "items": indent_items_map.get(str(po.indent_id), []),
+                }
+            else:
+                meta = indent_meta_map.get(str(po.indent_id), {})
+                po_dict["_indentDetailsPayload"] = {
+                    "trackingId": indent_tracking_no,
+                    "items": [
+                        {
+                            "productCode": item.product_code,
+                            "productName": item.product_name,
+                            "quantity": float(item.quantity),
+                            "siteName": site_name or po.site_id,
+                            "landedPrice": float(item.landed_price),
+                        }
+                        for item in po_items_map.get(po.id, [])
+                    ],
+                    "isMonthly": meta.get("isMonthly", False),
+                    "forMonth": meta.get("forMonth", ""),
+                    "totalValue": meta.get("totalValue", 0.0),
+                }
+
+        # GRN details (all views)
+        grn = grn_map.get(po.po_number)
+        po_dict["grnDetails"] = None
+        if grn:
+            po_dict["grnDetails"] = {
+                "items": [
+                    {
+                        "itemId": gi.item_id,
+                        "itemName": gi.item_name,
+                        "orderedQuantity": float(gi.ordered_quantity),
+                        "receivedQuantity": float(gi.received_quantity),
+                        "isAccepted": gi.is_accepted,
+                    }
+                    for gi in grn_items_map.get(grn.id, [])
+                ],
+                "signedDc": grn.signed_dc_url,
+                "comments": grn.comments,
+                "packagingImages": grn_photos_map.get(grn.id, []),
             }
+
+        # Invoice details (all views)
+        po_dict["invoiceDetails"] = invoice_details_map.get(po.po_number)
+
         po_list.append(po_dict)
 
     pagination = {
@@ -156,7 +311,7 @@ async def list_purchase_orders_paginated(
         "totalPages": math.ceil(total / limit) if limit else 1,
         "totalItems": total,
     }
-    return po_list, pagination
+    return po_list, pagination, available_states
 
 
 async def update_purchase_order(
@@ -314,12 +469,17 @@ async def get_grn_with_details(db: AsyncSession, grn_id: uuid.UUID):
 
 
 async def export_purchase_orders(
-    db: AsyncSession, search: str | None = None, vendor_code: str | None = None,
+    db: AsyncSession,
+    search: str | None = None,
+    vendor_code: str | None = None,
+    requestor_email: str | None = None,
 ):
     from openpyxl import Workbook
     from app.shared.excel_utils import workbook_to_streaming_response
 
-    pos = await list_purchase_orders(db, search=search, vendor_code=vendor_code)
+    pos = await list_purchase_orders(
+        db, search=search, vendor_code=vendor_code, requestor_email=requestor_email
+    )
 
     wb = Workbook()
     ws = wb.active
@@ -359,7 +519,9 @@ async def export_purchase_orders(
         ])
 
     ws.freeze_panes = "A2"
-    return workbook_to_streaming_response(wb, "purchase_orders.xlsx")
+    from datetime import date as _date
+    filename = f"Purchase_Orders_{_date.today().strftime('%Y-%m-%d')}.xlsx"
+    return workbook_to_streaming_response(wb, filename)
 
 
 async def download_po_excel(db: AsyncSession, po_number: str):

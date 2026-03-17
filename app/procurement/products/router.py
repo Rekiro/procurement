@@ -12,6 +12,7 @@ from app.procurement.products.schemas import (
     PriceChangeRequestCreate, PriceChangeRequestResponse,
     ApprovePriceChangeRequest, RejectPriceChangeRequest,
 )
+from app.procurement.sites.schemas import CatalogProduct, CatalogFilterOptions, FilterOption
 
 # Registered at /api/procurement/products
 router = APIRouter()
@@ -92,8 +93,47 @@ async def get_catalog(
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    products = await service.get_product_catalog(db)
-    return success_response([ProductResponse.from_orm(p).model_dump() for p in products])
+    rows = await service.get_product_catalog(db)
+
+    seen_categories: dict[str, bool] = {}
+    seen_brands: dict[str, bool] = {}
+    products_list = []
+
+    for product, vendor_name in rows:
+        if product.category and product.category not in seen_categories:
+            seen_categories[product.category] = True
+        brand = vendor_name or "N/A"
+        if brand not in seen_brands:
+            seen_brands[brand] = True
+
+        products_list.append(CatalogProduct(
+            periodFrom=None,
+            vendorName=vendor_name or "",
+            productCode=product.product_code,
+            productName=product.product_name,
+            landedPrice=float(product.final_price),
+            manufacturedBy=None,
+            brandName=None,
+            hsnCode=product.hsn_code,
+            packaging=product.uom,
+            usedFor=None,
+            category=product.category,
+            lifeCycleDays=None,
+            costOfTransportationPerKM=float(product.delivery_cost) if product.delivery_cost else None,
+            orderLeadTimeDays=product.delivery_days,
+            deliveryBy=None,
+            netProductCostPerDay=None,
+            gstSetOffAvailable=(float(product.gst_rate) > 0),
+            financeTreatment=None,
+        ).model_dump())
+
+    return success_response({
+        "filterOptions": {
+            "categories": [{"value": c, "label": c} for c in seen_categories],
+            "brands": [{"value": b, "label": b} for b in seen_brands],
+        },
+        "products": products_list,
+    })
 
 
 @router.delete("/{product_code}", response_model=ApiResponse)
@@ -180,9 +220,10 @@ async def bulk_upload_margins(
 
 @router.get("/bulk-upload-template")
 async def get_bulk_upload_template(
+    db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    return service.get_product_bulk_upload_template()
+    return await service.get_product_bulk_upload_template(db)
 
 
 @router.post("/bulk-upload", response_model=ApiResponse)

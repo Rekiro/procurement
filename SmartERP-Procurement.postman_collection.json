@@ -234,7 +234,7 @@
                   "key": "gstCert0",
                   "type": "file",
                   "src": "",
-                  "description": "GST certificate for entry 0 — field name must match gstDetails[0].gstCertificate"
+                  "description": "GST certificate for entry 0 \u00e2\u20ac\u201d field name must match gstDetails[0].gstCertificate"
                 },
                 {
                   "key": "aadhaarOrUdyamCopy",
@@ -274,7 +274,7 @@
                 }
               ]
             },
-            "description": "Multipart/form-data — 'data' field is a JSON string, all other fields are file uploads. Select actual files for each file field before sending."
+            "description": "Multipart/form-data \u00e2\u20ac\u201d 'data' field is a JSON string, all other fields are file uploads. Select actual files for each file field before sending."
           }
         },
         {
@@ -283,13 +283,33 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/vendor-applications?page=1&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "vendor-applications"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "vendor-applications"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                { "key": "status", "value": "", "disabled": true },
-                { "key": "search", "value": "", "disabled": true }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                }
               ]
             },
             "header": [
@@ -405,11 +425,23 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/products?page=1&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "products"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "products"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             },
             "header": [
@@ -481,10 +513,20 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/vendor/products?vendor_code={{lastVendorCode}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "vendor", "products"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "vendor",
+                "products"
+              ],
               "query": [
-                { "key": "vendor_code", "value": "{{lastVendorCode}}" }
+                {
+                  "key": "vendor_code",
+                  "value": "{{lastVendorCode}}"
+                }
               ]
             },
             "header": [
@@ -501,10 +543,20 @@
             "method": "DELETE",
             "url": {
               "raw": "{{base_url}}/api/procurement/products/{{lastProductCode}}?vendor_code={{lastVendorCode}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "products", "{{lastProductCode}}"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "products",
+                "{{lastProductCode}}"
+              ],
               "query": [
-                { "key": "vendor_code", "value": "{{lastVendorCode}}" }
+                {
+                  "key": "vendor_code",
+                  "value": "{{lastVendorCode}}"
+                }
               ]
             },
             "header": [
@@ -516,7 +568,7 @@
           }
         },
         {
-          "name": "Get Bulk Upload Template",
+          "name": "EP55 Get Product Bulk Upload Template",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/procurement/products/bulk-upload-template",
@@ -534,10 +586,20 @@
             "method": "POST",
             "url": {
               "raw": "{{base_url}}/api/procurement/products/bulk-upload?vendor_code={{lastVendorCode}}",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "products", "bulk-upload"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "products",
+                "bulk-upload"
+              ],
               "query": [
-                { "key": "vendor_code", "value": "{{lastVendorCode}}" }
+                {
+                  "key": "vendor_code",
+                  "value": "{{lastVendorCode}}"
+                }
               ]
             },
             "header": [
@@ -821,10 +883,22 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/sites/{{lastSiteId}}/history?month=2026-03",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "sites", "{{lastSiteId}}", "history"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "sites",
+                "{{lastSiteId}}",
+                "history"
+              ],
               "query": [
-                { "key": "month", "value": "2026-03", "description": "Optional YYYY-MM filter" }
+                {
+                  "key": "month",
+                  "value": "2026-03",
+                  "description": "Optional YYYY-MM filter"
+                }
               ]
             },
             "header": [
@@ -835,6 +909,62 @@
             ],
             "description": "Returns indent history for a site. Spec #8.6. Fields: siteId, trackingNo, requestDate, siteBudget, value, status, balance. Use real siteId (UUID from user-sites or 'siteA' for test data)."
           }
+        },
+        {
+          "name": "05 \u2014 Site Indent History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/procurement/sites/{{lastSiteId}}/indent-history?month=2026-03",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "sites",
+                "{{lastSiteId}}",
+                "indent-history"
+              ],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-03",
+                  "description": "Required YYYY-MM filter"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Has results array\", () => pm.expect(body.results).to.be.an(\"array\"));",
+                  "if (body.results.length > 0) {",
+                  "    const item = body.results[0];",
+                  "    pm.test(\"Item has trackingNo/category/value/status/siteName/monthYear\", () => {",
+                  "        pm.expect(item).to.have.property(\"trackingNo\");",
+                  "        pm.expect(item).to.have.property(\"category\");",
+                  "        pm.expect(item).to.have.property(\"value\");",
+                  "        pm.expect(item).to.have.property(\"status\");",
+                  "        pm.expect(item).to.have.property(\"siteName\");",
+                  "        pm.expect(item).to.have.property(\"monthYear\");",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -860,6 +990,10 @@
                 {
                   "key": "siteId",
                   "value": "SITE-001"
+                },
+                {
+                  "key": "requestorEmail",
+                  "value": "admin@smart.com"
                 }
               ]
             },
@@ -878,9 +1012,10 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var json = pm.response.json();",
-                  "if (json.results && json.results.id) {",
-                  "    pm.collectionVariables.set('lastEmrId', json.results.id);",
+                  "if (pm.response.code === 201) {",
+                  "  const r = pm.response.json();",
+                  "  pm.collectionVariables.set('lastEmrId', r.results.requestId);",
+                  "  pm.test('EMR created', () => pm.expect(pm.response.code).to.equal(201));",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -902,7 +1037,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"siteId\": \"SITE-001\",\n  \"monthYear\": \"2026-03\",\n  \"reason\": \"Additional PPE required due to new client requirements\"\n}"
+              "raw": "{\n  \"siteId\": \"{{lastSiteId}}\",\n  \"monthYear\": \"2026-03-01T00:00:00.000Z\",\n  \"reason\": \"Additional materials required for urgent repairs\",\n  \"requestorEmail\": \"admin@smart.com\"\n}"
             }
           }
         },
@@ -910,14 +1045,53 @@
           "name": "List EMRs",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/procurement/extra-material-requests",
+            "url": {
+              "raw": "{{baseUrl}}/api/procurement/extra-material-requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "extra-material-requests"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            },
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{token}}"
               }
             ]
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('List EMRs OK', () => pm.expect(pm.response.code).to.equal(200));",
+                  "const r = pm.response.json();",
+                  "if (r.results && r.results.requests && r.results.requests.length > 0) {",
+                  "  pm.collectionVariables.set('lastEmrId', r.results.requests[0].requestId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Approve EMR",
@@ -936,7 +1110,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"requestId\": \"{{lastEmrId}}\"\n}"
+              "raw": "{\n  \"requestIds\": [\n    \"{{lastEmrId}}\"\n  ]\n}"
             }
           }
         },
@@ -944,7 +1118,19 @@
           "name": "Reject EMR",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/procurement/extra-material-requests/{{lastEmrId}}/reject",
+            "url": {
+              "raw": "{{baseUrl}}/api/procurement/extra-material-requests/{{lastEmrId}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "extra-material-requests",
+                "{{lastEmrId}}",
+                "reject"
+              ]
+            },
             "header": [
               {
                 "key": "Content-Type",
@@ -957,7 +1143,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"rejectionReason\": \"Budget constraints for this month\"\n}"
+              "raw": "{\n  \"reason\": \"Budget constraints for this month\"\n}"
             }
           }
         }
@@ -1008,12 +1194,27 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/indents?page=1&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "indents"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "indents"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                { "key": "status", "value": "PENDING_PH_APPROVAL", "disabled": true }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING_PH_APPROVAL"
+                }
               ]
             },
             "header": [
@@ -1030,10 +1231,20 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/indents/my-indents?requestor_email=requestor@example.com",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "indents", "my-indents"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "indents",
+                "my-indents"
+              ],
               "query": [
-                { "key": "requestor_email", "value": "requestor@example.com" }
+                {
+                  "key": "requestor_email",
+                  "value": "requestor@example.com"
+                }
               ]
             },
             "header": [
@@ -1113,7 +1324,7 @@
               "mode": "raw",
               "raw": "{\n  \"indentIds\": [\"{{lastTrackingNo}}\"]\n}"
             },
-            "description": "Bulk approve. PH approval auto-creates POs grouped by vendor (status → PO_CREATED). RM approval moves to PENDING_PH_APPROVAL. Response includes poNumbers. Auto-saves first PO number to {{lastPoNumber}}."
+            "description": "Bulk approve. PH approval auto-creates POs grouped by vendor (status \u00e2\u2020\u2019 PO_CREATED). RM approval moves to PENDING_PH_APPROVAL. Response includes poNumbers. Auto-saves first PO number to {{lastPoNumber}}."
           }
         },
         {
@@ -1133,7 +1344,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"trackingNo\": \"{{lastTrackingNo}}\",\n  \"reason\": \"Items exceed monthly budget allocation\"\n}"
+              "raw": "{\n  \"trackingNo\": \"{{lastTrackingNo}}\",\n  \"reason\": \"Items exceed monthly budget allocation\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "description": "trackingNo in body (not path) because tracking numbers contain slashes."
           }
@@ -1184,14 +1400,52 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/purchase-orders?page=1&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "purchase-orders"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "purchase-orders"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                { "key": "search", "value": "", "disabled": true },
-                { "key": "vendorCode", "value": "", "disabled": true, "description": "Filter by vendor (vendor view)" },
-                { "key": "requestorEmail", "value": "", "disabled": true, "description": "Filter by requestor — includes _indentDetailsPayload with items for GRN form" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "vendorCode",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Filter by vendor (vendor view)"
+                },
+                {
+                  "key": "requestorEmail",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Filter by requestor \u00e2\u20ac\u201d includes _indentDetailsPayload with items for GRN form"
+                },
+                {
+                  "key": "status",
+                  "value": "GRN_SUBMITTED",
+                  "disabled": true,
+                  "description": "Filter by PO status"
+                },
+                {
+                  "key": "state",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Filter by site state/region"
+                }
               ]
             },
             "header": [
@@ -1275,10 +1529,22 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/purchase-orders/{{lastPoNumber}}/download?type=po_pdf",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "purchase-orders", "{{lastPoNumber}}", "download"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "purchase-orders",
+                "{{lastPoNumber}}",
+                "download"
+              ],
               "query": [
-                { "key": "type", "value": "po_pdf", "description": "po_pdf | po_excel | dc_pdf" }
+                {
+                  "key": "type",
+                  "value": "po_pdf",
+                  "description": "po_pdf | po_excel | dc_pdf"
+                }
               ]
             },
             "header": [
@@ -1333,10 +1599,28 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/purchase-orders/export",
-              "host": ["{{base_url}}"],
-              "path": ["api", "procurement", "purchase-orders", "export"],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "purchase-orders",
+                "export"
+              ],
               "query": [
-                { "key": "search", "value": "", "disabled": true, "description": "Filter export by PO number, status, or site" }
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Filter export by PO number, status, or site"
+                },
+                {
+                  "key": "requestorEmail",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Filter by requestor email"
+                }
               ]
             },
             "header": [
@@ -1360,9 +1644,11 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var json = pm.response.json();",
-                  "if (json.results && json.results.id) {",
-                  "    pm.collectionVariables.set('lastInvoiceId', json.results.id);",
+                  "if (pm.response.code === 201) {",
+                  "  const r = pm.response.json();",
+                  "  const inv = r.results;",
+                  "  pm.collectionVariables.set('lastInvoiceId', inv.invoiceId);",
+                  "  pm.test('Invoice submitted', () => pm.expect(pm.response.code).to.equal(201));",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -1383,8 +1669,21 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"invoiceNo\": \"VND-INV-2026-001\",\n  \"invoiceType\": \"material\",\n  \"state\": \"Maharashtra\",\n  \"billAmount\": 2600.00,\n  \"billUrl\": \"minio/invoices/vnd-inv-2026-001.pdf\",\n  \"poNumbers\": [\"{{lastPoNumber}}\"]\n}"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\n  \"poNumbers\": [\"{{lastPoNumber}}\"],\n  \"invoiceNo\": \"VND-INV-2026-001\",\n  \"state\": \"Maharashtra\",\n  \"billAmount\": 2600.00\n}",
+                  "type": "text",
+                  "description": "JSON string with invoice details"
+                },
+                {
+                  "key": "billUpload",
+                  "type": "file",
+                  "src": "",
+                  "description": "Required: PDF/JPG/PNG of the invoice bill"
+                }
+              ]
             }
           }
         },
@@ -1392,14 +1691,74 @@
           "name": "List Invoices",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/procurement/invoices",
+            "url": {
+              "raw": "{{baseUrl}}/api/procurement/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "invoices"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Pending",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "site",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "state",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "vendorCode",
+                  "value": "{{lastVendorCode}}",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{token}}"
               }
             ]
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('List invoices OK', () => pm.expect(pm.response.code).to.equal(200));",
+                  "const r = pm.response.json();",
+                  "if (r.results && r.results.invoices && r.results.invoices.length > 0) {",
+                  "  pm.collectionVariables.set('lastInvoiceId', r.results.invoices[0].invoiceId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Approve Invoice",
@@ -1418,7 +1777,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"invoiceId\": \"{{lastInvoiceId}}\"\n}"
+              "raw": "{\n  \"invoiceIds\": [\"{{lastInvoiceId}}\"]\n}"
             }
           }
         },
@@ -1426,7 +1785,19 @@
           "name": "Reject Invoice",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/procurement/invoices/{{lastInvoiceId}}/reject",
+            "url": {
+              "raw": "{{baseUrl}}/api/procurement/invoices/{{lastInvoiceId}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "procurement",
+                "invoices",
+                "{{lastInvoiceId}}",
+                "reject"
+              ]
+            },
             "header": [
               {
                 "key": "Content-Type",
@@ -1439,7 +1810,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"rejectionReason\": \"Bill amount does not match GRN quantities\"\n}"
+              "raw": "{\n  \"reason\": \"Bill amount does not match GRN quantities\"\n}"
             }
           }
         }
@@ -1449,15 +1820,15 @@
       "name": "Cash Purchases",
       "item": [
         {
-          "name": "Create Cash Purchase",
+          "name": "EP51 Create Cash Purchase",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "var json = pm.response.json();",
-                  "if (json.results && json.results.id) {",
-                  "    pm.collectionVariables.set('lastCashPurchaseId', json.results.id);",
+                  "if (json.results && json.results.purchaseId) {",
+                  "    pm.collectionVariables.set('lastCashPurchaseId', json.results.purchaseId);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -1469,25 +1840,42 @@
             "url": "{{base_url}}/api/procurement/cash-purchases",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{token}}"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"siteId\": \"SITE-001\",\n  \"forTheMonth\": \"2026-03\",\n  \"vendorName\": \"Local Hardware Store\",\n  \"gstNo\": \"27ABCDE1234F1Z5\",\n  \"products\": [\n    { \"productName\": \"Screwdriver Set\", \"quantity\": 2, \"cost\": 350.00 },\n    { \"productName\": \"Duct Tape\", \"quantity\": 5, \"cost\": 80.00 }\n  ],\n  \"totalCost\": 1100.00,\n  \"billUrl\": \"minio/cash-bills/march-2026-001.jpg\"\n}"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\"requestorEmail\": \"requestor@site.com\", \"siteId\": \"{{lastSiteId}}\", \"forTheMonth\": \"2026-03-01T00:00:00.000Z\", \"vendorName\": \"Local Hardware Store\", \"gstNo\": \"27ABCDE1234F1Z5\", \"products\": [{\"productName\": \"Screwdriver Set\", \"quantity\": 2, \"cost\": 350.00}, {\"productName\": \"Duct Tape\", \"quantity\": 5, \"cost\": 80.00}]}",
+                  "type": "text"
+                },
+                {
+                  "key": "billUpload",
+                  "type": "file",
+                  "src": []
+                }
+              ]
             }
           }
         },
         {
-          "name": "List Cash Purchases",
+          "name": "EP52 List Cash Purchases",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/procurement/cash-purchases",
+            "url": {
+              "raw": "{{base_url}}/api/procurement/cash-purchases?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "cash-purchases"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"},
+                {"key": "status", "value": "", "disabled": true},
+                {"key": "search", "value": "", "disabled": true}
+              ]
+            },
             "header": [
               {
                 "key": "Authorization",
@@ -1497,7 +1885,7 @@
           }
         },
         {
-          "name": "Approve Cash Purchase",
+          "name": "EP53 Approve Cash Purchases",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/procurement/cash-purchases/approve",
@@ -1513,12 +1901,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"purchaseId\": \"{{lastCashPurchaseId}}\"\n}"
+              "raw": "{\n  \"purchaseIds\": [\"{{lastCashPurchaseId}}\"]\n}"
             }
           }
         },
         {
-          "name": "Reject Cash Purchase",
+          "name": "EP54 Reject Cash Purchase",
           "request": {
             "method": "POST",
             "url": "{{base_url}}/api/procurement/cash-purchases/{{lastCashPurchaseId}}/reject",
@@ -1534,7 +1922,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"rejectionReason\": \"Bill not legible, please resubmit with clearer image\"\n}"
+              "raw": "{\n  \"reason\": \"Bill not legible, please resubmit with clearer image\"\n}"
             }
           }
         }

@@ -1,59 +1,54 @@
-import uuid
 from datetime import datetime
 
 from pydantic import BaseModel
 
 
-class InvoiceCreate(BaseModel):
+# --- Invoice Submit (parsed from multipart 'data' JSON string) ---
+
+class InvoiceSubmitData(BaseModel):
+    poNumbers: list[str]
     invoiceNo: str
-    invoiceType: str   # material / machinery / uniform
     state: str
     billAmount: float
-    billUrl: str
-    poNumbers: list[str]
 
+
+# --- Approve / Reject ---
+
+class ApproveInvoiceRequest(BaseModel):
+    invoiceIds: list[str]
+
+
+class RejectInvoiceRequest(BaseModel):
+    reason: str
+
+
+# --- Response ---
 
 class InvoiceResponse(BaseModel):
-    id: uuid.UUID
     invoiceId: str
-    vendorId: uuid.UUID | None
     invoiceNo: str
-    invoiceType: str
-    state: str
+    invoiceDate: datetime
     billAmount: float
+    state: str
     billUrl: str
     status: str
-    rejectionReason: str | None
+    reason: str | None
     poNumbers: list[str]
-    submittedAt: datetime
     reviewedAt: datetime | None
     reviewedBy: str | None
-
-    model_config = {"from_attributes": True}
 
     @classmethod
     def from_orm(cls, obj, po_numbers=None):
         return cls(
-            id=obj.id,
             invoiceId=obj.invoice_id,
-            vendorId=obj.vendor_id,
             invoiceNo=obj.invoice_no,
-            invoiceType=obj.invoice_type,
-            state=obj.state,
+            invoiceDate=obj.submitted_at,
             billAmount=float(obj.bill_amount),
+            state=obj.state,
             billUrl=obj.bill_url,
             status=obj.status,
-            rejectionReason=obj.rejection_reason,
+            reason=obj.rejection_reason,
             poNumbers=po_numbers or [],
-            submittedAt=obj.submitted_at,
             reviewedAt=obj.reviewed_at,
             reviewedBy=obj.reviewed_by,
         )
-
-
-class ApproveInvoiceRequest(BaseModel):
-    invoiceId: uuid.UUID
-
-
-class RejectInvoiceRequest(BaseModel):
-    rejectionReason: str

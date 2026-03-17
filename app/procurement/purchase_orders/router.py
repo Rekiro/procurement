@@ -24,15 +24,19 @@ async def list_purchase_orders(
     limit: int = Query(10, ge=1, le=100),
     vendorCode: str | None = None,
     requestorEmail: str | None = None,
+    status: str | None = None,
+    state: str | None = None,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    po_list, pagination = await service.list_purchase_orders_paginated(
+    po_list, pagination, available_states = await service.list_purchase_orders_paginated(
         db, search=search, page=page, limit=limit,
         vendor_code=vendorCode, requestor_email=requestorEmail,
+        status=status, state=state,
     )
     return success_response({
         "pagination": pagination,
+        "availableStates": available_states,
         "purchaseOrders": po_list,
     })
 
@@ -41,10 +45,13 @@ async def list_purchase_orders(
 async def export_purchase_orders(
     search: str | None = None,
     vendorCode: str | None = None,
+    requestorEmail: str | None = None,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    return await service.export_purchase_orders(db, search=search, vendor_code=vendorCode)
+    return await service.export_purchase_orders(
+        db, search=search, vendor_code=vendorCode, requestor_email=requestorEmail
+    )
 
 
 @router.get("/{po_number}/download")
@@ -87,22 +94,33 @@ async def update_purchase_order(
         raise HTTPException(status_code=400, detail="'data' must be valid JSON")
     data = PoUpdateData(**data_dict)
 
-    # Upload files if provided
+    _ext = {"application/pdf": "pdf", "image/jpeg": "jpg", "image/png": "png"}
+
+    # Upload files if provided (human-readable object names)
     pod_image_url = None
     signed_pod_url = None
     signed_dc_url = None
 
     pod_image = form.get("podImage")
     if pod_image and hasattr(pod_image, "read"):
-        pod_image_url = await upload_fastapi_file(pod_image, prefix=f"purchase-orders/{po_number}")
+        ext = _ext.get(pod_image.content_type, "bin")
+        pod_image_url = await upload_fastapi_file(
+            pod_image, object_name=f"purchase-orders/{po_number}/pod_image.{ext}"
+        )
 
     signed_pod = form.get("signedPod")
     if signed_pod and hasattr(signed_pod, "read"):
-        signed_pod_url = await upload_fastapi_file(signed_pod, prefix=f"purchase-orders/{po_number}")
+        ext = _ext.get(signed_pod.content_type, "bin")
+        signed_pod_url = await upload_fastapi_file(
+            signed_pod, object_name=f"purchase-orders/{po_number}/signed_pod.{ext}"
+        )
 
     signed_dc = form.get("signedDc")
     if signed_dc and hasattr(signed_dc, "read"):
-        signed_dc_url = await upload_fastapi_file(signed_dc, prefix=f"purchase-orders/{po_number}")
+        ext = _ext.get(signed_dc.content_type, "bin")
+        signed_dc_url = await upload_fastapi_file(
+            signed_dc, object_name=f"purchase-orders/{po_number}/signed_dc.{ext}"
+        )
 
     po = await service.update_purchase_order(
         db, po_number, data,
@@ -133,11 +151,16 @@ async def submit_grn(
         raise HTTPException(status_code=400, detail="'data' must be valid JSON")
     data = GrnData(**data_dict)
 
+    _ext = {"application/pdf": "pdf", "image/jpeg": "jpg", "image/png": "png"}
+
     # signedDc file is required
     signed_dc = form.get("signedDc")
     if not signed_dc or not hasattr(signed_dc, "read"):
         raise HTTPException(status_code=400, detail="'signedDc' file is required")
-    signed_dc_url = await upload_fastapi_file(signed_dc, prefix=f"grn/{po_number}")
+    ext = _ext.get(signed_dc.content_type, "bin")
+    signed_dc_url = await upload_fastapi_file(
+        signed_dc, object_name=f"grn/{po_number}/signed_dc.{ext}"
+    )
 
     # Optional photos (up to 2)
     photo_urls = []
@@ -146,7 +169,10 @@ async def submit_grn(
         if hasattr(photo_file, "read"):
             if len(photo_urls) >= 2:
                 raise HTTPException(status_code=400, detail="Maximum 2 photos allowed")
-            url = await upload_fastapi_file(photo_file, prefix=f"grn/{po_number}/photos")
+            ext = _ext.get(photo_file.content_type, "bin")
+            url = await upload_fastapi_file(
+                photo_file, object_name=f"grn/{po_number}/photo_{len(photo_urls) + 1}.{ext}"
+            )
             photo_urls.append(url)
 
     grn = await service.submit_grn(

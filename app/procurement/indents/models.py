@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, DateTime, Boolean, Numeric, Index
+from sqlalchemy import String, DateTime, Boolean, Numeric, Index, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,7 +18,7 @@ class ProcIndent(Base):
     for_month: Mapped[str] = mapped_column(String(30), nullable=False)
     is_monthly: Mapped[bool] = mapped_column(Boolean, nullable=False)
     category: Mapped[str] = mapped_column(String(30), nullable=False)
-    extra_material_request_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    emr_id: Mapped[str | None] = mapped_column(String(50), ForeignKey("proc_extra_material_requests.emr_id"), nullable=True)
     branch_gst: Mapped[str | None] = mapped_column(String(15), nullable=True)
     request_category: Mapped[str | None] = mapped_column(String(100), nullable=True)
     narration: Mapped[str | None] = mapped_column(String, nullable=True)

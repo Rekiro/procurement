@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -95,13 +94,10 @@ class SitePoHistoryItem(BaseModel):
 
 
 class SiteIndentHistoryItem(BaseModel):
-    id: uuid.UUID
     trackingNo: str
-    requestorEmail: str
-    forMonth: str
     category: str
+    value: float
     status: str
-    totalValue: float
-    createdAt: datetime
-
-    model_config = {"from_attributes": True}
+    siteName: str
+    monthYear: str
+    siteBudget: float | None

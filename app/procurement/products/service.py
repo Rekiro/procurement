@@ -133,11 +133,14 @@ async def reject_product(db: AsyncSession, product_code: str, data: RejectProduc
     return product
 
 
-async def get_product_catalog(db: AsyncSession) -> list[ProcProduct]:
+async def get_product_catalog(db: AsyncSession) -> list[tuple]:
     result = await db.execute(
-        select(ProcProduct).where(ProcProduct.status == "Approved").order_by(ProcProduct.product_name)
+        select(ProcProduct, ProcVendor.company_name)
+        .join(ProcVendor, ProcProduct.vendor_code == ProcVendor.vendor_code)
+        .where(ProcProduct.status == "Approved")
+        .order_by(ProcProduct.product_name)
     )
-    return list(result.scalars().all())
+    return list(result.all())
 
 
 async def list_vendor_products(db: AsyncSession, vendor_code: str) -> list[ProcProduct]:
@@ -237,11 +240,29 @@ def get_margin_template():
     return workbook_to_streaming_response(wb, "margins_template.xlsx")
 
 
-def get_product_bulk_upload_template():
-    headers = ["productName", "category", "subcategory", "price", "hsnCode", "isTaxExempt", "gstRate", "deliveryDays", "deliveryCost", "uom", "description"]
-    dropdowns = {"isTaxExempt": ["TRUE", "FALSE"], "uom": ["PCS", "KG", "LTR", "BOX", "MTR", "SET"]}
+async def get_product_bulk_upload_template(db: AsyncSession):
+    # Query distinct categories and subcategories from approved products
+    cat_result = await db.execute(
+        select(ProcProduct.category).where(ProcProduct.category.isnot(None)).distinct()
+    )
+    categories = sorted([r[0] for r in cat_result.all() if r[0]])
+
+    subcat_result = await db.execute(
+        select(ProcProduct.subcategory).where(ProcProduct.subcategory.isnot(None)).distinct()
+    )
+    subcategories = sorted([r[0] for r in subcat_result.all() if r[0]])
+
+    headers = [
+        "Product Name", "Category", "Sub Category", "Price", "HSN Code",
+        "GST Rate (%)", "UOM", "Number of Delivery Days", "Cost of Delivery", "Description",
+    ]
+    dropdowns = {
+        "Category": categories or ["General"],
+        "Sub Category": subcategories or ["General"],
+        "UOM": ["PCS", "KG", "LTR", "BOX", "MTR", "SET"],
+    }
     wb = create_template_workbook(headers, dropdowns)
-    return workbook_to_streaming_response(wb, "products_template.xlsx")
+    return workbook_to_streaming_response(wb, "Product_Upload_Template.xlsx")
 
 
 async def bulk_upload_margins(db: AsyncSession, file_bytes: bytes, filename: str, reviewed_by: str) -> dict:
@@ -285,21 +306,22 @@ async def bulk_upload_products(db: AsyncSession, file_bytes: bytes, filename: st
     for i, row in enumerate(rows, start=2):
         try:
             product_code = await _next_product_code(db)
+            price = float(row.get("Price", 0))
             product = ProcProduct(
                 product_code=product_code,
                 vendor_code=vendor.vendor_code,
-                product_name=str(row.get("productName", "")).strip(),
-                category=str(row.get("category", "")).strip(),
-                subcategory=str(row.get("subcategory", "")).strip(),
-                price=float(row.get("price", 0)),
-                hsn_code=str(row.get("hsnCode", "")).strip(),
-                is_tax_exempt=str(row.get("isTaxExempt", "FALSE")).upper() == "TRUE",
-                gst_rate=float(row.get("gstRate", 0)),
-                delivery_days=int(row.get("deliveryDays", 1)),
-                delivery_cost=float(row.get("deliveryCost", 0)),
-                uom=str(row.get("uom", "PCS")).strip(),
-                description=str(row.get("description", "")).strip() or None,
-                final_price=float(row.get("price", 0)),
+                product_name=str(row.get("Product Name", "")).strip(),
+                category=str(row.get("Category", "")).strip(),
+                subcategory=str(row.get("Sub Category", "")).strip(),
+                price=price,
+                hsn_code=str(row.get("HSN Code", "")).strip(),
+                is_tax_exempt=False,
+                gst_rate=float(row.get("GST Rate (%)", 0)),
+                delivery_days=int(row.get("Number of Delivery Days", 1)),
+                delivery_cost=float(row.get("Cost of Delivery", 0)),
+                uom=str(row.get("UOM", "PCS")).strip(),
+                description=str(row.get("Description", "")).strip() or None,
+                final_price=price,
                 status="Pending",
             )
             db.add(product)
