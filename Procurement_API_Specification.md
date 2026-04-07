@@ -531,15 +531,15 @@ A JSON object where the products array contains objects matching the provided Pr
 
 The frontend will send a JSON object detailing the cart submission.
 
-|   |   |   |   |
-|---|---|---|---|
-|**Field**|**Type**|**Required**|**Description**|
-|siteId|String|Yes|The unique identifier for the site the indent belongs to.|
-|forMonth|String|Yes|The month and year of the request (e.g., "October 2025").|
-|isMonthly|Boolean|Yes|true for recurring monthly orders. Must be false for Extra Material.|
-|category|String|Yes|Must be either "Regular" or "Extra Material".|
-|items|Array of Objects|Yes|The list of products being requested.|
-|extraMaterialRequestId|String|Conditional|Required only if category is "Extra Material". This is the unique ID of the approved permission request.|
+|                        |                  |              |                                                                                                          |
+| ---------------------- | ---------------- | ------------ | -------------------------------------------------------------------------------------------------------- |
+| **Field**              | **Type**         | **Required** | **Description**                                                                                          |
+| siteId                 | String           | Yes          | The unique identifier for the site the indent belongs to.                                                |
+| forMonth               | String           | Yes          | The month and year of the request (e.g., "October 2025").                                                |
+| isMonthly              | Boolean          | Yes          | true for recurring monthly orders. Must be false for Extra Material.                                     |
+| category               | String           | Yes          | Must be either "Regular" or "Extra Material".                                                            |
+| items                  | Array of Objects | Yes          | The list of products being requested.                                                                    |
+| extraMaterialRequestId | String           | Conditional  | Required only if category is "Extra Material". This is the unique ID of the approved permission request. |
 
 #### **items Object Structure:**
 
@@ -2357,43 +2357,31 @@ This is the primary API that populates the main table with all products associat
 
 A JSON object with pagination information and an array of Product objects.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 5, "totalItems": 48 },
-
-"products": [
-
-{
-
-"productCode": "P03386",
-
-"productName": "AIR DIFISUER MACHINE LOCAL - MS",
-
-"category": "Fragrance",
-
-"landedPrice": 1740.00,
-
-"orderLeadTimeDays": 10
-
-},
-
-{
-
-"productCode": "P03387",
-
-"productName": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
-
-"category": "Soap - Liquid",
-
-"landedPrice": 94.80,
-
-"orderLeadTimeDays": 10
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 5,
+        "totalItems": 48
+    },
+    "products": [
+        {
+            "productCode": "P03386",
+            "productName": "AIR DIFISUER MACHINE LOCAL - MS",
+            "category": "Fragrance",
+            "landedPrice": 1740.00,
+            "orderLeadTimeDays": 10
+        },
+        {
+            "productCode": "P03387",
+            "productName": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
+            "category": "Soap - Liquid",
+            "landedPrice": 94.80,
+            "orderLeadTimeDays": 10
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **2. API to Submit a Product Price Change Request**
 
@@ -2419,15 +2407,13 @@ This API is called when a vendor submits the "Edit Product Price" modal. It does
 
 **Example Payload**
 
+```json
 {
-
-"productId": "P03387",
-
-"newPrice": 99.50,
-
-"wefDate": "2025-12-01T00:00:00.000Z"
-
+    "productId": "P03387",
+    "newPrice": 99.50,
+    "wefDate": "2025-12-01T00:00:00.000Z"
 }
+```
 
 **3. API to Delete a Product**
 
@@ -2447,11 +2433,11 @@ This endpoint is called when a vendor confirms their choice in the "Delete Produ
 
 A successful deletion can return a confirmation message or simply a 204 No Content status.
 
+```json
 {
-
-"message": "Product P03387 has been successfully deleted."
-
+    "message": "Product P03387 has been successfully deleted."
 }
+```
 
 # 22. API Specification: Product Price Change Approval
 
@@ -2472,59 +2458,39 @@ This is the primary API that populates the main table with all product price cha
 
 A JSON object with pagination information and an array of ProductEditApprovalItem objects.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 2, "totalItems": 15 },
-
-"requests": [
-
-{
-
-"approvalId": "PROD-EDIT-1735912800000",
-
-"productId": "P03387",
-
-"productName": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
-
-"requesterName": "Global Supplies Co.",
-
-"requestDate": "2025-11-01",
-
-"originalPrice": 94.80,
-
-"newPrice": 99.50,
-
-"wefDate": "2025-12-01",
-
-"status": "Pending"
-
-},
-
-{
-
-"approvalId": "PROD-EDIT-1735912900000",
-
-"productId": "P03386",
-
-"productName": "AIR DIFISUER MACHINE LOCAL - MS",
-
-"requesterName": "Local Distributors",
-
-"requestDate": "2025-11-02",
-
-"originalPrice": 1740.00,
-
-"newPrice": 1750.00,
-
-"wefDate": "2025-12-15",
-
-"status": "Pending"
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 2,
+        "totalItems": 15
+    },
+    "requests": [
+        {
+            "approvalId": "PROD-EDIT-1735912800000",
+            "productId": "P03387",
+            "productName": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
+            "requesterName": "Global Supplies Co.",
+            "requestDate": "2025-11-01",
+            "originalPrice": 94.80,
+            "newPrice": 99.50,
+            "wefDate": "2025-12-01",
+            "status": "Pending"
+        },
+        {
+            "approvalId": "PROD-EDIT-1735912900000",
+            "productId": "P03386",
+            "productName": "AIR DIFISUER MACHINE LOCAL - MS",
+            "requesterName": "Local Distributors",
+            "requestDate": "2025-11-02",
+            "originalPrice": 1740.00,
+            "newPrice": 1750.00,
+            "wefDate": "2025-12-15",
+            "status": "Pending"
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **2. API to Approve Price Change Requests**
 
@@ -2535,11 +2501,14 @@ This endpoint handles both single and bulk approvals. Upon approval, the backend
 
 **Example Payload**
 
+```json
 {
-
-"approvalIds": ["PROD-EDIT-1735912800000", "PROD-EDIT-1735912900000"]
-
+    "approvalIds": [
+        "PROD-EDIT-1735912800000",
+        "PROD-EDIT-1735912900000"
+    ]
 }
+```
 
 **3. API to Reject a Price Change Request**
 
@@ -2552,11 +2521,11 @@ This endpoint handles the rejection of a single price change request and require
 
 **Example Payload**
 
+```json
 {
-
-"reason": "The proposed price increase of 10% is too high. Please provide more justification or submit a revised request."
-
+    "reason": "The proposed price increase of 10% is too high. Please provide more justification or submit a revised request."
 }
+```
 
 # 23. API Specification: Product Margin Management 
 
@@ -2575,55 +2544,37 @@ This API provides the data needed to populate the main table on the "Manage Prod
 
 A JSON object with pagination and an array of ProductMarginData objects. The margin-related fields (marginPercentage, directMarginAmount, finalPriceWithMargin) will reflect the currently saved values in the database (or be null if not set).
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 10, "totalItems": 95 },
-
-"products": [
-
-{
-
-"id": "P03387",
-
-"title": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
-
-"category": "Soap - Liquid",
-
-"price": 94.80,
-
-"deliveryDate": "2025-11-15",
-
-"marginPercentage": 10,
-
-"directMarginAmount": null,
-
-"finalPriceWithMargin": 104.28
-
-},
-
-{
-
-"id": "P04112",
-
-"title": "Safety Helmet",
-
-"category": "Safety Gear",
-
-"price": 350.00,
-
-"deliveryDate": "2025-11-18",
-
-"marginPercentage": null,
-
-"directMarginAmount": null,
-
-"finalPriceWithMargin": null
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 10,
+        "totalItems": 95
+    },
+    "products": [
+        {
+            "id": "P03387",
+            "title": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
+            "category": "Soap - Liquid",
+            "price": 94.80,
+            "deliveryDate": "2025-11-15",
+            "marginPercentage": 10,
+            "directMarginAmount": null,
+            "finalPriceWithMargin": 104.28
+        },
+        {
+            "id": "P04112",
+            "title": "Safety Helmet",
+            "category": "Safety Gear",
+            "price": 350.00,
+            "deliveryDate": "2025-11-18",
+            "marginPercentage": null,
+            "directMarginAmount": null,
+            "finalPriceWithMargin": null
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **2. API to Download the Margin Template**
 
@@ -2677,55 +2628,33 @@ This is the core endpoint where the PH submits the filled-out template. The back
 
 A successful response should confirm the update and return the newly calculated data for the frontend to refresh the table.
 
+```json
 {
-
-"message": "Margins for 25 products have been successfully updated.",
-
-"updatedProducts": [
-
-{
-
-"id": "P03387",
-
-"title": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
-
-"category": "Soap - Liquid",
-
-"price": 94.80,
-
-"deliveryDate": "2025-11-15",
-
-"marginPercentage": 10,
-
-"directMarginAmount": null,
-
-"finalPriceWithMargin": 104.28
-
-},
-
-{
-
-"id": "P03386",
-
-"title": "AIR DIFISUER MACHINE LOCAL - MS",
-
-"category": "Fragrance",
-
-"price": 1740.00,
-
-"deliveryDate": "2025-11-20",
-
-"marginPercentage": null,
-
-"directMarginAmount": 160,
-
-"finalPriceWithMargin": 1900.00
-
+    "message": "Margins for 25 products have been successfully updated.",
+    "updatedProducts": [
+        {
+            "id": "P03387",
+            "title": "ALA BLEACH / RIN ALA (500 ML)HUL - MS",
+            "category": "Soap - Liquid",
+            "price": 94.80,
+            "deliveryDate": "2025-11-15",
+            "marginPercentage": 10,
+            "directMarginAmount": null,
+            "finalPriceWithMargin": 104.28
+        },
+        {
+            "id": "P03386",
+            "title": "AIR DIFISUER MACHINE LOCAL - MS",
+            "category": "Fragrance",
+            "price": 1740.00,
+            "deliveryDate": "2025-11-20",
+            "marginPercentage": null,
+            "directMarginAmount": 160,
+            "finalPriceWithMargin": 1900.00
+        }
+    ]
 }
-
-]
-
-}
+```
 
 # 24. API Specification: Requestor's "My Indents" Page
 
@@ -2742,113 +2671,66 @@ This is the primary API for this page. It is called to fetch all indents created
 
 A JSON object containing a list of filterOptions for the dropdowns and a comprehensive indents array. Each indent object in the array represents a single, complete indent submission and contains all the nested product details.
 
+```json
 {
-
-"filterOptions": {
-
-"sites": ["Site A", "Site B", "Site C"]
-
-},
-
-"indents": [
-
-{
-
-"trackingNo": "IND/2025/50808",
-
-"monthYear": "October 2025",
-
-"requestDate": "2025-10-26",
-
-"siteName": "Site B",
-
-"category": "Regular",
-
-"isMonthly": true,
-
-"siteBudget": 10000.00,
-
-"totalValue": 361.20,
-
-"status": "PENDING_PH_APPROVAL",
-
-"items": [
-
-{
-
-"productCode": "P03387",
-
-"productName": "ALL KLEAN - 1LTR",
-
-"quantity": 3,
-
-"landedPrice": 86.40,
-
-"size": null
-
-},
-
-{
-
-"productCode": "P03389",
-
-"productName": "ALL OUT MACHINE - MS",
-
-"quantity": 1,
-
-"landedPrice": 102.00,
-
-"size": null
-
+    "filterOptions": {
+        "sites": [
+            "Site A",
+            "Site B",
+            "Site C"
+        ]
+    },
+    "indents": [
+        {
+            "trackingNo": "IND/2025/50808",
+            "monthYear": "October 2025",
+            "requestDate": "2025-10-26",
+            "siteName": "Site B",
+            "category": "Regular",
+            "isMonthly": true,
+            "siteBudget": 10000.00,
+            "totalValue": 361.20,
+            "status": "PENDING_PH_APPROVAL",
+            "items": [
+                {
+                    "productCode": "P03387",
+                    "productName": "ALL KLEAN - 1LTR",
+                    "quantity": 3,
+                    "landedPrice": 86.40,
+                    "size": null
+                },
+                {
+                    "productCode": "P03389",
+                    "productName": "ALL OUT MACHINE - MS",
+                    "quantity": 1,
+                    "landedPrice": 102.00,
+                    "size": null
+                }
+            ]
+        },
+        {
+            "trackingNo": "IND/2025/50801",
+            "monthYear": "October 2025",
+            "requestDate": "2025-10-24",
+            "siteName": "Site A",
+            "category": "Regular",
+            "isMonthly": false,
+            "siteBudget": 15000.00,
+            "totalValue": 7999.90,
+            "status": "PO_CREATED",
+            "items": [
+                {
+                    "productCode": "P04112",
+                    "productName": "Safety Shoes",
+                    "quantity": 10,
+                    "landedPrice": 799.99,
+                    "size": "9"
+                }
+            ]
+        }
+    ]
 }
-
-]
-
-},
-
-{
-
-"trackingNo": "IND/2025/50801",
-
-"monthYear": "October 2025",
-
-"requestDate": "2025-10-24",
-
-"siteName": "Site A",
-
-"category": "Regular",
-
-"isMonthly": false,
-
-"siteBudget": 15000.00,
-
-"totalValue": 7999.90,
-
-"status": "PO_CREATED",
-
-"items": [
-
-{
-
-"productCode": "P04112",
-
-"productName": "Safety Shoes",
-
-"quantity": 10,
-
-"landedPrice": 799.99,
-
-"size": "9"
-
-}
-
-]
-
-}
-
-]
-
-}
+```
 
 **Object Structures**
 
@@ -2892,81 +2774,50 @@ This is the primary API that populates the NotificationsPage and provides the 
 
 A JSON object with pagination, a total unreadCount, and an array of Notification objects. The link field contains a static path to the relevant page from the application's router.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 5, "totalItems": 45 },
-
-"unreadCount": 3,
-
-"notifications": [
-
-{
-
-"id": "notif_p1",
-
-"title": "Vendor Approval Required",
-
-"message": "New vendor 'SteelTech Industries' is awaiting your approval.",
-
-"date": "2025-10-31T11:20:00.000Z",
-
-"isRead": false,
-
-"link": "/vendor-approval"
-
-},
-
-{
-
-"id": "notif_p4",
-
-"title": "Price Change Request",
-
-"message": "Vendor 'PipeMasters' has requested a price change for product #P-3456.",
-
-"date": "2025-10-30T14:15:00.000Z",
-
-"isRead": false,
-
-"link": "/product-edit-approval"
-
-},
-
-{
-
-"id": "notif_v3",
-
-"title": "New PO Received",
-
-"message": "You have received a new Purchase Order #PO-951432 from Site B.",
-
-"date": "2025-10-28T09:15:00.000Z",
-
-"isRead": false,
-
-"link": "/vendor-purchase-orders"
-
-},
-
-{
-
-"id": "notif_r2",
-
-"title": "Indent Approved",
-
-"message": "Your indent #IND/2025/50808 for Site B has been approved and a PO has been created.",
-
-"date": "2025-10-28T09:14:00.000Z",
-
-"isRead": true,
-
-"link": "/indents"
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 5,
+        "totalItems": 45
+    },
+    "unreadCount": 3,
+    "notifications": [
+        {
+            "id": "notif_p1",
+            "title": "Vendor Approval Required",
+            "message": "New vendor 'SteelTech Industries' is awaiting your approval.",
+            "date": "2025-10-31T11:20:00.000Z",
+            "isRead": false,
+            "link": "/vendor-approval"
+        },
+        {
+            "id": "notif_p4",
+            "title": "Price Change Request",
+            "message": "Vendor 'PipeMasters' has requested a price change for product #P-3456.",
+            "date": "2025-10-30T14:15:00.000Z",
+            "isRead": false,
+            "link": "/product-edit-approval"
+        },
+        {
+            "id": "notif_v3",
+            "title": "New PO Received",
+            "message": "You have received a new Purchase Order #PO-951432 from Site B.",
+            "date": "2025-10-28T09:15:00.000Z",
+            "isRead": false,
+            "link": "/vendor-purchase-orders"
+        },
+        {
+            "id": "notif_r2",
+            "title": "Indent Approved",
+            "message": "Your indent #IND/2025/50808 for Site B has been approved and a PO has been created.",
+            "date": "2025-10-28T09:14:00.000Z",
+            "isRead": true,
+            "link": "/indents"
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **2. API to Mark Notifications as Read**
 
@@ -2986,19 +2837,22 @@ The body accepts an array of notification IDs. Sending an empty array signifies 
 
 **Example Payload (Marking specific notifications)**
 
+```json
 {
-
-"notificationIds": ["notif_p1", "notif_p4"]
-
+    "notificationIds": [
+        "notif_p1",
+        "notif_p4"
+    ]
 }
+```
 
 **Example Payload (Marking all as read)**
 
+```json
 {
-
-"notificationIds": []
-
+    "notificationIds": []
 }
+```
 
 **Comprehensive Notification Events**
 
@@ -3061,16 +2915,22 @@ This API populates the "Select Site" dropdown, providing a list of sites the use
 - **Success Response (200 OK):**  
     A JSON array of site objects.
 
+```json
 [
-
-{ "value": "SITE-001", "label": "Site A - Mumbai HQ" },
-
-{ "value": "SITE-002", "label": "Site B - Bangalore Campus" },
-
-{ "value": "SITE-003", "label": "Site C - Delhi Branch" }
-
+    {
+        "value": "SITE-001",
+        "label": "Site A - Mumbai HQ"
+    },
+    {
+        "value": "SITE-002",
+        "label": "Site B - Bangalore Campus"
+    },
+    {
+        "value": "SITE-003",
+        "label": "Site C - Delhi Branch"
+    }
 ]
-
+```
 # 27. API Specification: Fetch Machine Options
 
 This API populates the "Machine Name" dropdown within the request table, providing a list of available machinery.
@@ -3080,15 +2940,22 @@ This API populates the "Machine Name" dropdown within the request table, providi
 - **Success Response (200 OK):**  
     A JSON array of machine objects.
 
+```json
 [
-
-{ "value": "Single Disc Scrubber", "label": "Single Disc Scrubber" },
-
-{ "value": "High Pressure Jet", "label": "High Pressure Jet" },
-
-{ "value": "Vacuum Cleaner (Wet/Dry)", "label": "Vacuum Cleaner (Wet/Dry)" }
-
+    {
+        "value": "Single Disc Scrubber",
+        "label": "Single Disc Scrubber"
+    },
+    {
+        "value": "High Pressure Jet",
+        "label": "High Pressure Jet"
+    },
+    {
+        "value": "Vacuum Cleaner (Wet/Dry)",
+        "label": "Vacuum Cleaner (Wet/Dry)"
+    }
 ]
+```
 
 # 28. API Specification: Submit Machinery Requisition
 
@@ -3118,39 +2985,25 @@ This API is called when the Site Manager submits the machinery request form. It 
 
 **Example JSON Payload:**
 
+```json
 {
-
-"siteId": "SITE-002",
-
-"justification": "New wing opened in the Bangalore campus, requiring an additional scrubber for the larger floor area.",
-
-"items": [
-
-{
-
-"machineName": "Auto Scrubber",
-
-"quantity": 1,
-
-"requestType": "new"
-
-},
-
-{
-
-"machineName": "Vacuum Cleaner (Wet/Dry)",
-
-"quantity": 1,
-
-"requestType": "replacement",
-
-"oldAssetId": "ASSET-VC-045"
-
+    "siteId": "SITE-002",
+    "justification": "New wing opened in the Bangalore campus, requiring an additional scrubber for the larger floor area.",
+    "items": [
+        {
+            "machineName": "Auto Scrubber",
+            "quantity": 1,
+            "requestType": "new"
+        },
+        {
+            "machineName": "Vacuum Cleaner (Wet/Dry)",
+            "quantity": 1,
+            "requestType": "replacement",
+            "oldAssetId": "ASSET-VC-045"
+        }
+    ]
 }
-
-]
-
-}
+```
 
 - **Validation & Business Logic:**
     - requestType: Must be one of ["new", "replacement"].
@@ -3171,54 +3024,36 @@ This API populates the main "Machinery Approvals" table with requests that are p
 - **Success Response (200 OK):**  
     A JSON object containing the list of pending requests.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 3, "totalItems": 28 },
-
-"requests": [
-
-{
-
-"id": "MREQ-12345",
-
-"siteName": "Site B - Bangalore Campus",
-
-"requestDate": "2023-11-10T10:00:00Z",
-
-"status": "PENDING_PH_APPROVAL",
-
-"items": [
-
-{
-
-"machineName": "Auto Scrubber",
-
-"quantity": 1,
-
-"requestType": "new"
-
-},
-
-{
-
-"machineName": "Vacuum Cleaner (Wet/Dry)",
-
-"quantity": 1,
-
-"requestType": "replacement",
-
-"oldAssetId": "ASSET-VC-045"
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 3,
+        "totalItems": 28
+    },
+    "requests": [
+        {
+            "id": "MREQ-12345",
+            "siteName": "Site B - Bangalore Campus",
+            "requestDate": "2023-11-10T10:00:00Z",
+            "status": "PENDING_PH_APPROVAL",
+            "items": [
+                {
+                    "machineName": "Auto Scrubber",
+                    "quantity": 1,
+                    "requestType": "new"
+                },
+                {
+                    "machineName": "Vacuum Cleaner (Wet/Dry)",
+                    "quantity": 1,
+                    "requestType": "replacement",
+                    "oldAssetId": "ASSET-VC-045"
+                }
+            ]
+        }
+    ]
 }
-
-]
-
-}
-
-]
-
-}
-
+```
 # 30. API Specification: Fetch Full Request Details for Approval
 
 This API is called when the Procurement Head clicks "Review". It fetches the complete request details _and_ cross-references the required machines against the global asset inventory to find available spares for transfer.
@@ -3228,53 +3063,40 @@ This API is called when the Procurement Head clicks "Review". It fetches the com
 - **Success Response (200 OK):**  
     A single JSON object containing the full request and available inventory.
 
+```json
 {
-
-"id": "MREQ-12345",
-
-"siteName": "Site B - Bangalore Campus",
-
-"justification": "New wing opened, and old vacuum cleaner is non-functional.",
-
-"requestDate": "2023-11-10T10:00:00Z",
-
-"items": [
-
-{
-
-"machineName": "Auto Scrubber",
-
-"quantity": 1,
-
-"requestType": "new",
-
-"availableInventory": []
-
-},
-
-{
-
-"machineName": "Single Disc Scrubber",
-
-"quantity": 1,
-
-"requestType": "replacement",
-
-"oldAssetId": "ASSET-SDS-012",
-
-"availableInventory": [
-
-{ "site": "Site A - Mumbai", "serial": "MAC-004", "status": "Idle" },
-
-{ "site": "Warehouse", "serial": "MAC-009", "status": "Spare" }
-
-]
-
+    "id": "MREQ-12345",
+    "siteName": "Site B - Bangalore Campus",
+    "justification": "New wing opened, and old vacuum cleaner is non-functional.",
+    "requestDate": "2023-11-10T10:00:00Z",
+    "items": [
+        {
+            "machineName": "Auto Scrubber",
+            "quantity": 1,
+            "requestType": "new",
+            "availableInventory": []
+        },
+        {
+            "machineName": "Single Disc Scrubber",
+            "quantity": 1,
+            "requestType": "replacement",
+            "oldAssetId": "ASSET-SDS-012",
+            "availableInventory": [
+                {
+                    "site": "Site A - Mumbai",
+                    "serial": "MAC-004",
+                    "status": "Idle"
+                },
+                {
+                    "site": "Warehouse",
+                    "serial": "MAC-009",
+                    "status": "Spare"
+                }
+            ]
+        }
+    ]
 }
-
-]
-
-}
+```
 
 # 31. API Specification: Fetch Machinery Vendors
 
@@ -3284,13 +3106,18 @@ This API populates the vendor dropdown in the modal when "Purchase New" is selec
 - **Authorization:** Procurement Head role required.
 - **Success Response (200 OK):**
 
+```json
 [
-
-{ "value": "VEN-M01", "label": "Heavy Duty Equipments Ltd" },
-
-{ "value": "VEN-M02", "label": "CleanTech Solutions" }
-
+    {
+        "value": "VEN-M01",
+        "label": "Heavy Duty Equipments Ltd"
+    },
+    {
+        "value": "VEN-M02",
+        "label": "CleanTech Solutions"
+    }
 ]
+```
 
 # 32. API Specification: Fulfill Machinery Request
 
@@ -3319,37 +3146,24 @@ This API is called when the PH clicks "Confirm Allocation". It is a critical tra
 
 **Example JSON Payload:**
 
+```json
 {
-
-"decisions": [
-
-{
-
-"machineName": "Auto Scrubber",
-
-"quantity": 1,
-
-"source": "PURCHASE",
-
-"vendorId": "VEN-M02"
-
-},
-
-{
-
-"machineName": "Single Disc Scrubber",
-
-"quantity": 1,
-
-"source": "TRANSFER",
-
-"sourceSiteId": "009"
-
+    "decisions": [
+        {
+            "machineName": "Auto Scrubber",
+            "quantity": 1,
+            "source": "PURCHASE",
+            "vendorId": "VEN-M02"
+        },
+        {
+            "machineName": "Single Disc Scrubber",
+            "quantity": 1,
+            "source": "TRANSFER",
+            "sourceSiteId": "009"
+        }
+    ]
 }
-
-]
-
-}
+```
 
 - **Backend Business Logic:**
     1. **Process Purchases:** For all items with source: "PURCHASE", group them by vendorId and create a distinct **Machinery Purchase Order** for each vendor. The backend must look up the price for each machine from a master price list.
@@ -3373,11 +3187,11 @@ This API handles the rejection of a machinery request.
 
 **Example JSON Payload:**
 
+```json
 {
-
-"reason": "The existing machine at the site can be repaired. A new purchase is not justified at this time."
-
+    "reason": "The existing machine at the site can be repaired. A new purchase is not justified at this time."
 }
+```
 
 # 34. API Specification: Vendor Machinery Purchase Orders
 
@@ -3396,71 +3210,45 @@ This API populates the main table with Machinery POs assigned to the authenticat
 - **Success Response (200 OK):**  
     A JSON object containing the list of POs.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 4, "totalItems": 35 },
-
-"orders": [
-
-{
-
-"id": "uuid-mac-123",
-
-"poNumber": "PO-MAC-98765",
-
-"poDate": "2023-11-10T12:00:00Z",
-
-"vendorName": "Heavy Duty Equipments Ltd",
-
-"vendorId": "VEN-M01",
-
-"siteName": "Site B - Bangalore Campus",
-
-"region": "Karnataka",
-
-"status": "In Transit",
-
-"deliveryType": "Courier",
-
-"courierName": "Delhivery",
-
-"podNumber": "DEL987654321",
-
-"expectedDeliveryDate": "2023-11-17",
-
-"dateOfDelivery": null,
-
-"tat": 7,
-
-"tatStatus": "Within TAT",
-
-"reason": null,
-
-"podImageUrl": null,
-
-"signedPodUrl": null,
-
-"signedDcUrl": null,
-
-"items": [
-
-{
-
-"productName": "Auto Scrubber",
-
-"quantity": 1,
-
-"landedPrice": 150000
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 4,
+        "totalItems": 35
+    },
+    "orders": [
+        {
+            "id": "uuid-mac-123",
+            "poNumber": "PO-MAC-98765",
+            "poDate": "2023-11-10T12:00:00Z",
+            "vendorName": "Heavy Duty Equipments Ltd",
+            "vendorId": "VEN-M01",
+            "siteName": "Site B - Bangalore Campus",
+            "region": "Karnataka",
+            "status": "In Transit",
+            "deliveryType": "Courier",
+            "courierName": "Delhivery",
+            "podNumber": "DEL987654321",
+            "expectedDeliveryDate": "2023-11-17",
+            "dateOfDelivery": null,
+            "tat": 7,
+            "tatStatus": "Within TAT",
+            "reason": null,
+            "podImageUrl": null,
+            "signedPodUrl": null,
+            "signedDcUrl": null,
+            "items": [
+                {
+                    "productName": "Auto Scrubber",
+                    "quantity": 1,
+                    "landedPrice": 150000
+                }
+            ]
+        }
+    ]
 }
-
-]
-
-}
-
-]
-
-}
+```
 
 **2. API to Fetch Single Machinery PO Details**
 
@@ -3521,75 +3309,47 @@ This API populates the requestor's dashboard with Machinery POs relevant to thei
 - **Success Response (200 OK):**  
     A JSON object with pagination and an array of order objects.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 2, "totalItems": 15 },
-
-"orders": [
-
-{
-
-"id": "uuid-mac-123",
-
-"poNumber": "PO-MAC-98765",
-
-"poDate": "2023-11-10T12:00:00Z",
-
-"vendorName": "Heavy Duty Equipments Ltd",
-
-"siteName": "Site B - Bangalore Campus",
-
-"region": "Karnataka",
-
-"status": "Delivered",
-
-"deliveryType": "Courier",
-
-"courierName": "Delhivery",
-
-"podNumber": "DEL987654321",
-
-"dcNumber": "DC-VENDOR-556",
-
-"dcDate": "2023-11-15",
-
-"expectedDeliveryDate": "2023-11-17",
-
-"dateOfDelivery": "2023-11-16",
-
-"tat": 7,
-
-"tatStatus": "Within TAT",
-
-"reason": null,
-
-"podImageUrl": "https://storage.cloud.com/pods/pod-mac-123.pdf",
-
-"signedPodUrl": "https://storage.cloud.com/pods/signed-pod-mac-123.pdf",
-
-"signedDcUrl": "https://storage.cloud.com/dcs/signed-dc-mac-123.pdf",
-
-"signedDciSmartUrl": "https://storage.cloud.com/dcs/ismart-dc-mac-123.pdf",
-
-"items": [
-
-{
-
-"productName": "Auto Scrubber",
-
-"quantity": 1,
-
-"landedPrice": 150000
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 2,
+        "totalItems": 15
+    },
+    "orders": [
+        {
+            "id": "uuid-mac-123",
+            "poNumber": "PO-MAC-98765",
+            "poDate": "2023-11-10T12:00:00Z",
+            "vendorName": "Heavy Duty Equipments Ltd",
+            "siteName": "Site B - Bangalore Campus",
+            "region": "Karnataka",
+            "status": "Delivered",
+            "deliveryType": "Courier",
+            "courierName": "Delhivery",
+            "podNumber": "DEL987654321",
+            "dcNumber": "DC-VENDOR-556",
+            "dcDate": "2023-11-15",
+            "expectedDeliveryDate": "2023-11-17",
+            "dateOfDelivery": "2023-11-16",
+            "tat": 7,
+            "tatStatus": "Within TAT",
+            "reason": null,
+            "podImageUrl": "https://storage.cloud.com/pods/pod-mac-123.pdf",
+            "signedPodUrl": "https://storage.cloud.com/pods/signed-pod-mac-123.pdf",
+            "signedDcUrl": "https://storage.cloud.com/dcs/signed-dc-mac-123.pdf",
+            "signedDciSmartUrl": "https://storage.cloud.com/dcs/ismart-dc-mac-123.pdf",
+            "items": [
+                {
+                    "productName": "Auto Scrubber",
+                    "quantity": 1,
+                    "landedPrice": 150000
+                }
+            ]
+        }
+    ]
 }
-
-]
-
-}
-
-]
-
-}
+```
 
 **2. API to Submit Machinery GRN**
 
@@ -3630,59 +3390,39 @@ This API populates the vendor's dashboard with all Machinery POs that are eligib
 - **Success Response (200 OK):**  
     A JSON object containing the list of eligible POs, with all fields required by the UI.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 3, "totalItems": 25 },
-
-"orders": [
-
-{
-
-"id": "uuid-mac-123",
-
-"poNumber": "PO-MAC-98765",
-
-"poDate": "2023-11-10T12:00:00Z",
-
-"vendorName": "Heavy Duty Equipments Ltd",
-
-"siteName": "Site B - Bangalore Campus",
-
-"region": "Karnataka",
-
-"status": "GRN_SUBMITTED",
-
-"deliveryType": "Courier",
-
-"dateOfDelivery": "2023-11-16",
-
-"podImageUrl": "https://storage.cloud.com/pods/pod-mac-123.pdf",
-
-"signedDcUrl": "https://storage.cloud.com/dcs/signed-dc-mac-123.pdf",
-
-"dcNumber": "DC-VENDOR-556",
-
-"dcDate": "2023-11-15",
-
-"tat": 7,
-
-"courierName": "Delhivery",
-
-"podNumber": "DEL987654321",
-
-"expectedDeliveryDate": "2023-11-17",
-
-"tatStatus": "Within TAT",
-
-"reason": null,
-
-"invoiceDetails": []
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 3,
+        "totalItems": 25
+    },
+    "orders": [
+        {
+            "id": "uuid-mac-123",
+            "poNumber": "PO-MAC-98765",
+            "poDate": "2023-11-10T12:00:00Z",
+            "vendorName": "Heavy Duty Equipments Ltd",
+            "siteName": "Site B - Bangalore Campus",
+            "region": "Karnataka",
+            "status": "GRN_SUBMITTED",
+            "deliveryType": "Courier",
+            "dateOfDelivery": "2023-11-16",
+            "podImageUrl": "https://storage.cloud.com/pods/pod-mac-123.pdf",
+            "signedDcUrl": "https://storage.cloud.com/dcs/signed-dc-mac-123.pdf",
+            "dcNumber": "DC-VENDOR-556",
+            "dcDate": "2023-11-15",
+            "tat": 7,
+            "courierName": "Delhivery",
+            "podNumber": "DEL987654321",
+            "expectedDeliveryDate": "2023-11-17",
+            "tatStatus": "Within TAT",
+            "reason": null,
+            "invoiceDetails": []
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **2. API to Fetch Consolidated Items for Invoice Summary**
 
@@ -3692,47 +3432,36 @@ Called when the vendor selects multiple POs and clicks "Create Invoice". The API
 - **Authorization:** Vendor role required.
 - **Request Body:**
 
+```json
 {
-
-"poNumbers": ["PO-MAC-98765", "PO-MAC-98766"]
-
+    "poNumbers": [
+        "PO-MAC-98765",
+        "PO-MAC-98766"
+    ]
 }
+```
 
 **Success Response (200 OK):**
 
+```json
 {
-
-"totalValue": 275000.00,
-
-"items": [
-
-{
-
-"poNumber": "PO-MAC-98765",
-
-"productName": "Auto Scrubber",
-
-"quantity": 1,
-
-"landedPrice": 150000
-
-},
-
-{
-
-"poNumber": "PO-MAC-98766",
-
-"productName": "High Pressure Jet",
-
-"quantity": 2,
-
-"landedPrice": 62500
-
+    "totalValue": 275000.00,
+    "items": [
+        {
+            "poNumber": "PO-MAC-98765",
+            "productName": "Auto Scrubber",
+            "quantity": 1,
+            "landedPrice": 150000
+        },
+        {
+            "poNumber": "PO-MAC-98766",
+            "productName": "High Pressure Jet",
+            "quantity": 2,
+            "landedPrice": 62500
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **3. API to Upload Consolidated Machinery Invoice**
 
@@ -3787,88 +3516,58 @@ This API provides the consolidated view of machinery invoices submitted by vendo
 4. **Success Response (200 OK):**  
     A JSON object containing an array of consolidated invoices.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 2, "totalItems": 15 },
-
-"invoices": [
-
-{
-
-"invoiceId": "INV-17098234",
-
-"invoiceNo": "MAC/OCT/2023/045",
-
-"invoiceDate": "2023-10-30T10:00:00Z",
-
-"billAmount": 325000.00,
-
-"state": "Karnataka",
-
-"billUrl": "https://storage.cloud.com/invoices/Karnataka/mac-vendor-01.pdf",
-
-"status": "Pending",
-
-"poNumber": "PO-MAC-98765, PO-MAC-98766",
-
-"vendorName": "Heavy Duty Equipments Ltd",
-
-"siteName": "Multiple Sites",
-
-"poDate": "2023-10-20T09:00:00Z",
-
-"relatedPoNumbers": ["PO-MAC-98765", "PO-MAC-98766"],
-
-"poItems": [
-
-{
-
-"productName": "Auto Scrubber",
-
-"quantity": 1,
-
-"landedPrice": 150000,
-
-"rate": 150000,
-
-"amount": 150000
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 2,
+        "totalItems": 15
+    },
+    "invoices": [
+        {
+            "invoiceId": "INV-17098234",
+            "invoiceNo": "MAC/OCT/2023/045",
+            "invoiceDate": "2023-10-30T10:00:00Z",
+            "billAmount": 325000.00,
+            "state": "Karnataka",
+            "billUrl": "https://storage.cloud.com/invoices/Karnataka/mac-vendor-01.pdf",
+            "status": "Pending",
+            "poNumber": "PO-MAC-98765, PO-MAC-98766",
+            "vendorName": "Heavy Duty Equipments Ltd",
+            "siteName": "Multiple Sites",
+            "poDate": "2023-10-20T09:00:00Z",
+            "relatedPoNumbers": [
+                "PO-MAC-98765",
+                "PO-MAC-98766"
+            ],
+            "poItems": [
+                {
+                    "productName": "Auto Scrubber",
+                    "quantity": 1,
+                    "landedPrice": 150000,
+                    "rate": 150000,
+                    "amount": 150000
+                }
+            ],
+            "grnDetails": {
+                "comments": "PO-MAC-98765: Received in good condition. \nPO-MAC-98766: Small scratch on body.",
+                "signedDc": "https://storage.cloud.com/dcs/signed-dc-123.pdf",
+                "packagingImages": [
+                    "https://storage.cloud.com/grn/img1.jpg"
+                ],
+                "items": [
+                    {
+                        "itemName": "Auto Scrubber",
+                        "orderedQuantity": 1,
+                        "receivedQuantity": 1,
+                        "isAccepted": true
+                    }
+                ]
+            }
+        }
+    ]
 }
-
-],
-
-"grnDetails": {
-
-"comments": "PO-MAC-98765: Received in good condition. \nPO-MAC-98766: Small scratch on body.",
-
-"signedDc": "https://storage.cloud.com/dcs/signed-dc-123.pdf",
-
-"packagingImages": ["https://storage.cloud.com/grn/img1.jpg"],
-
-"items": [
-
-{
-
-"itemName": "Auto Scrubber",
-
-"orderedQuantity": 1,
-
-"receivedQuantity": 1,
-
-"isAccepted": true
-
-}
-
-]
-
-}
-
-}
-
-]
-
-}
-
+```
 # 38. API Specification: Approve Machinery Invoices
 
 This endpoint handles the approval of one or more machinery invoices.
@@ -3885,13 +3584,16 @@ This endpoint handles the approval of one or more machinery invoices.
 
 **Example Payload:**
 
+```json
 {
-
-"invoiceIds": ["INV-17098234", "INV-17098235"]
-
+    "invoiceIds": [
+        "INV-17098234",
+        "INV-17098235"
+    ]
 }
+```
 
-1. **Business Logic:**
+4. **Business Logic:**
     - Change the status of the invoice records to Approved.
     - Update all linked Machinery Purchase Orders to a status reflecting financial approval (e.g., PAYMENT_PENDING).
 
@@ -3907,13 +3609,13 @@ Used to reject a specific invoice with a reason.
 
 **Example Payload:**
 
+```json
 {
-
-"reason": "Invoice amount does not match the quantity received in GRN."
-
+    "reason": "Invoice amount does not match the quantity received in GRN."
 }
+```
 
-1. **Business Logic:**
+4. **Business Logic:**
     - Change invoice status to Rejected.
     - Update linked POs back to GRN_SUBMITTED so the vendor can re-upload a corrected invoice.
     - Trigger an email notification to the Vendor with the rejection reason.
@@ -3925,25 +3627,18 @@ This API specifically serves the files required by the GrnDetailsModal for mac
 1. **Endpoint:** GET /api/machinery/grn/{poNumber}/evidence
 2. **Success Response (200 OK):**
 
+```json
 {
-
-"signedDcUrl": "https://storage.cloud.com/dcs/signed-dc-123.pdf",
-
-"assetConditionPhotos": [
-
-"https://storage.cloud.com/grn/machine-condition-01.jpg",
-
-"https://storage.cloud.com/grn/machine-condition-02.jpg"
-
-],
-
-"packagingImages": [
-
-"https://storage.cloud.com/grn/box-condition.jpg"
-
-]
-
+    "signedDcUrl": "https://storage.cloud.com/dcs/signed-dc-123.pdf",
+    "assetConditionPhotos": [
+        "https://storage.cloud.com/grn/machine-condition-01.jpg",
+        "https://storage.cloud.com/grn/machine-condition-02.jpg"
+    ],
+    "packagingImages": [
+        "https://storage.cloud.com/grn/box-condition.jpg"
+    ]
 }
+```
 
 # 41. API Specification: Fetch Employees for Uniform Request
 
@@ -3957,45 +3652,28 @@ This API is used to populate the "Identify Employee" dropdown. It provides the n
 4. **Success Response (200 OK):**  
     A JSON array containing employee details.
 
+```json
 [
-
-{
-
-"code": "EMP101",
-
-"name": "Rahul Sharma",
-
-"designation": "Housekeeper",
-
-"gender": "Male",
-
-"client": "Global Enterprises",
-
-"site": "Site A",
-
-"lastIssuanceDate": "2023-05-20"
-
-},
-
-{
-
-"code": "EMP103",
-
-"name": "Amit Kumar",
-
-"designation": "Pantry Boy",
-
-"gender": "Male",
-
-"client": "Tech Solutions",
-
-"site": "Site C",
-
-"lastIssuanceDate": null
-
-}
-
+    {
+        "code": "EMP101",
+        "name": "Rahul Sharma",
+        "designation": "Housekeeper",
+        "gender": "Male",
+        "client": "Global Enterprises",
+        "site": "Site A",
+        "lastIssuanceDate": "2023-05-20"
+    },
+    {
+        "code": "EMP103",
+        "name": "Amit Kumar",
+        "designation": "Pantry Boy",
+        "gender": "Male",
+        "client": "Tech Solutions",
+        "site": "Site C",
+        "lastIssuanceDate": null
+    }
 ]
+```
 
 # 42. API Specification: Fetch Uniform Configuration
 
@@ -4010,57 +3688,55 @@ This API returns the list of uniform items available for a specific designation 
 4. **Success Response (200 OK):**  
     A JSON object where keys are item names and values contain size options.
 
+```json
 {
-
-"items": [
-
-{
-
-"itemName": "Shirt",
-
-"availableSizes": [
-
-{ "value": "38", "label": "38 (S)" },
-
-{ "value": "40", "label": "40 (M)" },
-
-{ "value": "42", "label": "42 (L)" }
-
-]
-
-},
-
-{
-
-"itemName": "Pant",
-
-"availableSizes": [
-
-{ "value": "30", "label": "30" },
-
-{ "value": "32", "label": "32" }
-
-]
-
-},
-
-{
-
-"itemName": "Shoes",
-
-"availableSizes": [
-
-{ "value": "7", "label": "7" },
-
-{ "value": "8", "label": "8" }
-
-]
-
+    "items": [
+        {
+            "itemName": "Shirt",
+            "availableSizes": [
+                {
+                    "value": "38",
+                    "label": "38 (S)"
+                },
+                {
+                    "value": "40",
+                    "label": "40 (M)"
+                },
+                {
+                    "value": "42",
+                    "label": "42 (L)"
+                }
+            ]
+        },
+        {
+            "itemName": "Pant",
+            "availableSizes": [
+                {
+                    "value": "30",
+                    "label": "30"
+                },
+                {
+                    "value": "32",
+                    "label": "32"
+                }
+            ]
+        },
+        {
+            "itemName": "Shoes",
+            "availableSizes": [
+                {
+                    "value": "7",
+                    "label": "7"
+                },
+                {
+                    "value": "8",
+                    "label": "8"
+                }
+            ]
+        }
+    ]
 }
-
-]
-
-}
+```
 
 # 43. API Specification: Submit Uniform Request
 
@@ -4092,41 +3768,26 @@ This API is called when the user clicks "Forward Request". It validates the requ
 
 **Example JSON Payload:**
 
+```json
 {
-
-"employeeCode": "EMP102",
-
-"issueType": "backfill",
-
-"replacingEmployeeCode": "EMP999",
-
-"justification": null,
-
-"items": [
-
-{
-
-"itemName": "Shirt",
-
-"size": "40",
-
-"quantity": 2
-
-},
-
-{
-
-"itemName": "Shoes",
-
-"size": "8",
-
-"quantity": 1
-
+    "employeeCode": "EMP102",
+    "issueType": "backfill",
+    "replacingEmployeeCode": "EMP999",
+    "justification": null,
+    "items": [
+        {
+            "itemName": "Shirt",
+            "size": "40",
+            "quantity": 2
+        },
+        {
+            "itemName": "Shoes",
+            "size": "8",
+            "quantity": 1
+        }
+    ]
 }
-
-]
-
-}
+```
 
 **Allowed Values & Business Validation:**
 
@@ -4158,69 +3819,44 @@ This API populates the "Uniform Approvals" table. It allows the Procurement Head
 4. **Success Response (200 OK):**  
     A JSON object containing the requests. The backend must attach the current stock level (availableStock) for each requested item so the UI can highlight shortages immediately.
 
+```json
 {
-
-"pagination": { "currentPage": 1, "totalPages": 5, "totalItems": 42 },
-
-"requests": [
-
-{
-
-"id": "UNF-12345",
-
-"employeeCode": "EMP101",
-
-"employeeName": "Rahul Sharma",
-
-"designation": "Housekeeper",
-
-"site": "Site A",
-
-"client": "Global Enterprises",
-
-"issueType": "replacement",
-
-"justification": "Old uniform torn during duty",
-
-"requestDate": "2023-10-25T10:00:00Z",
-
-"status": "PENDING_PH_APPROVAL",
-
-"isEarlyReplacement": true,
-
-"items": [
-
-{
-
-"itemName": "Shirt",
-
-"size": "40",
-
-"quantity": 2,
-
-"availableStock": 2
-
-},
-
-{
-
-"itemName": "Shoes",
-
-"size": "8",
-
-"quantity": 1,
-
-"availableStock": 0
-
+    "pagination": {
+        "currentPage": 1,
+        "totalPages": 5,
+        "totalItems": 42
+    },
+    "requests": [
+        {
+            "id": "UNF-12345",
+            "employeeCode": "EMP101",
+            "employeeName": "Rahul Sharma",
+            "designation": "Housekeeper",
+            "site": "Site A",
+            "client": "Global Enterprises",
+            "issueType": "replacement",
+            "justification": "Old uniform torn during duty",
+            "requestDate": "2023-10-25T10:00:00Z",
+            "status": "PENDING_PH_APPROVAL",
+            "isEarlyReplacement": true,
+            "items": [
+                {
+                    "itemName": "Shirt",
+                    "size": "40",
+                    "quantity": 2,
+                    "availableStock": 2
+                },
+                {
+                    "itemName": "Shoes",
+                    "size": "8",
+                    "quantity": 1,
+                    "availableStock": 0
+                }
+            ]
+        }
+    ]
 }
-
-]
-
-}
-
-]
-
-}
+```
 
 **Note:** isEarlyReplacement should be calculated by the backend if the request date is within 18 months of the last issue date, assisting the UI in displaying the warning badge.
 
@@ -4235,33 +3871,22 @@ This API is called when the user clicks the "History" tab in the modal. It shows
     - {employeeCode} (string, required): The ID of the employee.
 4. **Success Response (200 OK):**
 
+```json
 [
-
-{
-
-"date": "2023-05-20",
-
-"type": "New Issue",
-
-"items": "Shirt (2), Pant (2), Shoes (1)",
-
-"status": "Issued"
-
-},
-
-{
-
-"date": "2022-11-10",
-
-"type": "Replacement",
-
-"items": "Shoes (1)",
-
-"status": "Issued"
-
-}
-
+    {
+        "date": "2023-05-20",
+        "type": "New Issue",
+        "items": "Shirt (2), Pant (2), Shoes (1)",
+        "status": "Issued"
+    },
+    {
+        "date": "2022-11-10",
+        "type": "Replacement",
+        "items": "Shoes (1)",
+        "status": "Issued"
+    }
 ]
+```
 
 # 46. API Specification: Fetch Uniform Vendors
 

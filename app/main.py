@@ -8,6 +8,7 @@ if sys.platform == "win32" and sys.version_info < (3, 14):
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import settings
@@ -26,6 +27,7 @@ from app.procurement.cash_purchases.router import router as cash_router
 from app.procurement.machinery_requests.router import router as machinery_router
 from app.procurement.uniform_requests.router import router as uniform_router
 from app.procurement.notifications.router import router as notifications_router
+from app.procurement.files.router import router as files_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -63,13 +65,26 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             )
         ]
         for inner_err in exc.detail.get("errors", []):
-            errors.append(ErrorDetail(errorType="VALIDATION_ERROR", errorMessage=str(inner_err), location=""))
+            if isinstance(inner_err, dict):
+                # Extract 'error' as errorMessage; pass remaining keys as extra fields
+                msg = inner_err.pop("error", str(inner_err))
+                errors.append(ErrorDetail(errorType="VALIDATION_ERROR", errorMessage=msg, location="", **inner_err))
+            else:
+                errors.append(ErrorDetail(errorType="VALIDATION_ERROR", errorMessage=str(inner_err), location=""))
     else:
         errors = [ErrorDetail(errorType=error_type, errorMessage=str(exc.detail), location="")]
     return JSONResponse(
         status_code=exc.status_code,
         content=ApiErrorResponse(errors=errors).model_dump(),
     )
+
+
+@app.exception_handler(IntegrityError)
+async def integrity_error_handler(request: Request, exc: IntegrityError):
+    # Extract the most useful part of the DB error message
+    orig = str(exc.orig) if exc.orig else str(exc)
+    errors = [ErrorDetail(errorType="INTEGRITY_ERROR", errorMessage=orig, location="")]
+    return JSONResponse(status_code=409, content=ApiErrorResponse(errors=errors).model_dump())
 
 
 @app.exception_handler(RequestValidationError)
@@ -125,6 +140,9 @@ app.include_router(uniform_router, prefix="/api/procurement", tags=["Uniforms"])
 
 # Notifications
 app.include_router(notifications_router, prefix="/api/procurement/notifications", tags=["Notifications"])
+
+# Files (preview/download from MinIO)
+app.include_router(files_router, prefix="/api/procurement/files", tags=["Files"])
 
 
 @app.get("/procurement/health")

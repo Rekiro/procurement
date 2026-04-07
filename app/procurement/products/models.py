@@ -40,7 +40,7 @@ class ProcProduct(Base):
 class ProcProductPriceChangeRequest(Base):
     __tablename__ = "proc_product_price_change_requests"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
     product_code: Mapped[str] = mapped_column(String(20), ForeignKey("proc_products.product_code"), nullable=False)
     vendor_code: Mapped[str] = mapped_column(String(50), nullable=False)
     new_price: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)

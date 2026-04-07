@@ -63,16 +63,17 @@ Until decided, keep the current approach: single credential, business identifier
 
 All entity IDs use the format `{PREFIX}{N:07d}` — a short prefix + 7 zero-padded digits. This is the ONLY identifier — it serves as both the DB primary key and the API identifier. No UUIDs anywhere unless explicitly confirmed.
 
-| Entity | Prefix | Example |
-|--------|--------|---------|
-| Vendor | VEN | VEN0000001 |
-| Product | PRD | PRD0000001 |
-| Indent | IND | IND0000001 |
-| Purchase Order | PO | PO0000001 |
-| Invoice | INV | INV0000001 |
-| Cash Purchase | CP | CP0000001 |
-| Machinery Req | MREQ | MREQ0000001 |
-| Uniform Req | UNF | UNF0000001 |
+| Entity | Prefix | Digits | Example | Capacity |
+|--------|--------|--------|---------|----------|
+| Vendor | VEN | 7 | VEN0000001 | 9,999,999 |
+| Product | PRD | 7 | PRD0000001 | 9,999,999 |
+| Indent | IND | 7 | IND0000001 | 9,999,999 |
+| Purchase Order | PO | 7 | PO0000001 | 9,999,999 |
+| Invoice | INV | 7 | INV0000001 | 9,999,999 |
+| Cash Purchase | CP | 7 | CP0000001 | 9,999,999 |
+| Machinery Req | MREQ | 7 | MREQ0000001 | 9,999,999 |
+| Uniform Req | UNF | 7 | UNF0000001 | 9,999,999 |
+| Price Change Req | PROD-EDIT | timestamp_ms | PROD-EDIT-1743320012345 | unlimited |
 
 Child/junction tables (items, links) without their own business ID use `SERIAL` integer PK.
 

@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Any
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class ProductCreate(BaseModel):
@@ -110,21 +110,14 @@ class RejectProductRequest(BaseModel):
 
 
 class PriceChangeRequestCreate(BaseModel):
-    productCode: str
-    vendorCode: str
-    newPrice: float
+    productId: str = Field(..., min_length=1)   # productCode of the product
+    vendorCode: str = Field(..., min_length=1)
+    newPrice: float = Field(..., gt=0)
     wefDate: date   # future date
-
-    @field_validator("newPrice")
-    @classmethod
-    def price_must_be_positive(cls, v):
-        if v <= 0:
-            raise ValueError("New price must be greater than 0")
-        return v
 
 
 class PriceChangeRequestResponse(BaseModel):
-    id: int
+    id: str
     productCode: str
     vendorCode: str
     newPrice: float
@@ -154,11 +147,11 @@ class PriceChangeRequestResponse(BaseModel):
 
 
 class ApprovePriceChangeRequest(BaseModel):
-    approvalId: int
+    approvalIds: list[str] = Field(..., min_length=1)
 
 
 class RejectPriceChangeRequest(BaseModel):
-    reason: str
+    reason: str = Field(..., min_length=1)
 
 
 class MarginResponse(BaseModel):

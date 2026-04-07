@@ -143,8 +143,8 @@ async def delete_product(
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    await service.delete_product(db, product_code, vendor_code)
-    return success_response({"message": "Product deleted"})
+    deleted_code = await service.delete_product(db, product_code, vendor_code)
+    return success_response({"message": f"Product {deleted_code} has been successfully deleted."})
 
 
 # --- Price change requests ---
@@ -161,26 +161,48 @@ async def create_price_change_request(
 
 @router.get("/price-change-requests", response_model=ApiResponse)
 async def list_price_change_requests(
+    status: str | None = Query(None),
+    search: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    requests = await service.list_price_change_requests(db)
-    return success_response([PriceChangeRequestResponse.from_orm(r).model_dump() for r in requests])
+    rows, pagination = await service.list_price_change_requests(
+        db, status_filter=status, search=search, page=page, limit=limit,
+    )
+    return success_response({
+        "pagination": pagination,
+        "requests": [
+            {
+                "approvalId": pcr.id,
+                "productId": pcr.product_code,
+                "productName": product_name,
+                "requesterName": vendor_name,
+                "requestDate": pcr.created_at.strftime("%Y-%m-%d"),
+                "originalPrice": float(original_price),
+                "newPrice": float(pcr.new_price),
+                "wefDate": pcr.wef_date.strftime("%Y-%m-%d") if hasattr(pcr.wef_date, "strftime") else str(pcr.wef_date),
+                "status": pcr.status,
+            }
+            for pcr, product_name, vendor_name, original_price in rows
+        ],
+    })
 
 
 @router.post("/price-change-requests/approve", response_model=ApiResponse)
-async def approve_price_change_request(
+async def approve_price_change_requests(
     data: ApprovePriceChangeRequest,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    pcr = await service.approve_price_change_request(db, data, reviewed_by=user.sub)
-    return success_response(PriceChangeRequestResponse.from_orm(pcr).model_dump())
+    pcrs = await service.approve_price_change_requests(db, data, reviewed_by=user.sub)
+    return success_response([PriceChangeRequestResponse.from_orm(pcr).model_dump() for pcr in pcrs])
 
 
 @router.post("/price-change-requests/{approval_id}/reject", response_model=ApiResponse)
 async def reject_price_change_request(
-    approval_id: int,
+    approval_id: str,
     data: RejectPriceChangeRequest,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
@@ -193,28 +215,48 @@ async def reject_price_change_request(
 
 @router.get("/margins", response_model=ApiResponse)
 async def get_margins(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    products = await service.get_margins(db)
-    return success_response([MarginResponse.from_orm(p).model_dump() for p in products])
+    from datetime import date, timedelta
+    products, pagination = await service.get_margins(db, page=page, limit=limit)
+    today = date.today()
+    return success_response({
+        "pagination": pagination,
+        "products": [
+            {
+                "id": p.product_code,
+                "title": p.product_name,
+                "category": p.category,
+                "price": float(p.price),
+                "deliveryDate": (today + timedelta(days=p.delivery_days)).isoformat(),
+                "marginPercentage": float(p.margin_percentage) if p.margin_percentage is not None else None,
+                "directMarginAmount": float(p.direct_margin_amount) if p.direct_margin_amount is not None else None,
+                "finalPriceWithMargin": float(p.final_price) if (p.margin_percentage is not None or p.direct_margin_amount is not None) else None,
+            }
+            for p in products
+        ],
+    })
 
 
 @router.get("/margins/export-template")
 async def export_margins_template(
+    db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    return service.get_margin_template()
+    return await service.get_margin_template(db)
 
 
 @router.post("/margins/bulk-upload", response_model=ApiResponse)
 async def bulk_upload_margins(
-    file: UploadFile = File(...),
+    marginFile: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    file_bytes = await file.read()
-    result = await service.bulk_upload_margins(db, file_bytes, file.filename, reviewed_by=user.sub)
+    file_bytes = await marginFile.read()
+    result = await service.bulk_upload_margins(db, file_bytes, marginFile.filename, reviewed_by=user.sub)
     return success_response(result)
 
 
@@ -228,13 +270,13 @@ async def get_bulk_upload_template(
 
 @router.post("/bulk-upload", response_model=ApiResponse)
 async def bulk_upload_products(
-    file: UploadFile = File(...),
+    productsFile: UploadFile = File(...),
     vendor_code: str = Query(...),
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    file_bytes = await file.read()
-    result = await service.bulk_upload_products(db, file_bytes, file.filename, vendor_code)
+    file_bytes = await productsFile.read()
+    result = await service.bulk_upload_products(db, file_bytes, productsFile.filename, vendor_code)
     return success_response(result)
 
 
@@ -243,8 +285,22 @@ async def bulk_upload_products(
 @vendor_router.get("/vendor/products", response_model=ApiResponse)
 async def list_my_products(
     vendor_code: str = Query(...),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    products = await service.list_vendor_products(db, vendor_code)
-    return success_response([ProductResponse.from_orm(p).model_dump() for p in products])
+    products, pagination = await service.list_vendor_products(db, vendor_code, page=page, limit=limit)
+    return success_response({
+        "pagination": pagination,
+        "products": [
+            {
+                "productCode": p.product_code,
+                "productName": p.product_name,
+                "category": p.category,
+                "landedPrice": float(p.final_price),
+                "orderLeadTimeDays": p.delivery_days,
+            }
+            for p in products
+        ],
+    })

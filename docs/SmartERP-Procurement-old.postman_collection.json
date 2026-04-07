@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "SmartERP â Procurement",
-    "description": "Procurement backend API collection.\n\nSetup:\n  1. Set base_url = http://localhost:8001 (or your port)\n  2. Run 'Login' â token is auto-saved to {{token}}\n  3. Run requests in order within each folder. Create requests auto-save IDs to collection variables (lastVendorId, lastProductId, etc.) for use in approve/reject requests.\n\nNote: Create Vendor uses email 'admin@smart.com'. If you get 409 (already exists), manually set {{lastVendorCode}} from the DB.",
+    "name": "SmartERP \u00e2\u20ac\u201d Procurement",
+    "description": "Procurement backend API collection.\n\nSetup:\n  1. Set base_url = http://localhost:8001 (or your port)\n  2. Run 'Login' \u00e2\u20ac\u201d token is auto-saved to {{token}}\n  3. Run requests in order within each folder. Create requests auto-save IDs to collection variables (lastVendorId, lastProductId, etc.) for use in approve/reject requests.\n\nNote: Create Vendor uses email 'admin@smart.com'. If you get 409 (already exists), manually set {{lastVendorCode}} from the DB.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -234,7 +234,7 @@
                   "key": "gstCert0",
                   "type": "file",
                   "src": "",
-                  "description": "GST certificate for entry 0 â field name must match gstDetails[0].gstCertificate"
+                  "description": "GST certificate for entry 0 \u00e2\u20ac\u201d field name must match gstDetails[0].gstCertificate"
                 },
                 {
                   "key": "aadhaarOrUdyamCopy",
@@ -274,7 +274,7 @@
                 }
               ]
             },
-            "description": "Multipart/form-data â 'data' field is a JSON string, all other fields are file uploads. Select actual files for each file field before sending."
+            "description": "Multipart/form-data \u00e2\u20ac\u201d 'data' field is a JSON string, all other fields are file uploads. Select actual files for each file field before sending."
           }
         },
         {
@@ -666,34 +666,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/products/price-change-requests?page=1&limit=10",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "procurement",
-                "products",
-                "price-change-requests"
-              ],
+              "host": ["{{base_url}}"],
+              "path": ["api","procurement","products","price-change-requests"],
               "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "status",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "search",
-                  "value": "",
-                  "disabled": true
-                }
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"},
+                {"key": "status", "value": "", "disabled": true},
+                {"key": "search", "value": "", "disabled": true}
               ]
             },
             "header": [
@@ -757,25 +736,9 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/products/margins?page=1&limit=10",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "procurement",
-                "products",
-                "margins"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api","procurement","products","margins"],
+              "query": [{"key": "page","value": "1"},{"key": "limit","value": "10"}]
             },
             "header": [
               {
@@ -827,7 +790,35 @@
       "name": "Sites",
       "item": [
         {
-          "name": "User Sites",
+          "name": "01 \u00e2\u20ac\u201d Site Options (Dropdown)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has sites', () => pm.expect(j.results).to.be.an('array').and.lengthOf.at.least(1));",
+                  "if (j.results.length > 0) pm.collectionVariables.set('lastSiteId', j.results[0].siteId);",
+                  "console.log('Sites count:', j.results.length, '| first:', j.results[0]?.siteName);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/sites/options",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "02 \u00e2\u20ac\u201d User Sites",
           "event": [
             {
               "listen": "test",
@@ -857,7 +848,7 @@
           }
         },
         {
-          "name": "Site Material Catalog",
+          "name": "03 \u00e2\u20ac\u201d Site Material Catalog",
           "event": [
             {
               "listen": "test",
@@ -884,7 +875,7 @@
           }
         },
         {
-          "name": "Site Order History (indent-based)",
+          "name": "04 \u00e2\u20ac\u201d Site Order History (indent-based)",
           "event": [
             {
               "listen": "test",
@@ -935,7 +926,7 @@
           }
         },
         {
-          "name": "Site Indent History",
+          "name": "05 \u2014 Site Indent History",
           "request": {
             "method": "GET",
             "header": [
@@ -1070,9 +1061,9 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/api/procurement/extra-material-requests",
+              "raw": "{{baseUrl}}/api/procurement/extra-material-requests",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "api",
@@ -1143,9 +1134,9 @@
           "request": {
             "method": "POST",
             "url": {
-              "raw": "{{base_url}}/api/procurement/extra-material-requests/{{lastEmrId}}/reject",
+              "raw": "{{baseUrl}}/api/procurement/extra-material-requests/{{lastEmrId}}/reject",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "api",
@@ -1348,7 +1339,7 @@
               "mode": "raw",
               "raw": "{\n  \"indentIds\": [\"{{lastTrackingNo}}\"]\n}"
             },
-            "description": "Bulk approve. PH approval auto-creates POs grouped by vendor (status â PO_CREATED). RM approval moves to PENDING_PH_APPROVAL. Response includes poNumbers. Auto-saves first PO number to {{lastPoNumber}}."
+            "description": "Bulk approve. PH approval auto-creates POs grouped by vendor (status \u00e2\u2020\u2019 PO_CREATED). RM approval moves to PENDING_PH_APPROVAL. Response includes poNumbers. Auto-saves first PO number to {{lastPoNumber}}."
           }
         },
         {
@@ -1456,7 +1447,7 @@
                   "key": "requestorEmail",
                   "value": "",
                   "disabled": true,
-                  "description": "Filter by requestor â includes _indentDetailsPayload with items for GRN form"
+                  "description": "Filter by requestor \u00e2\u20ac\u201d includes _indentDetailsPayload with items for GRN form"
                 },
                 {
                   "key": "status",
@@ -1716,9 +1707,9 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{base_url}}/api/procurement/invoices",
+              "raw": "{{baseUrl}}/api/procurement/invoices",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "api",
@@ -1810,9 +1801,9 @@
           "request": {
             "method": "POST",
             "url": {
-              "raw": "{{base_url}}/api/procurement/invoices/{{lastInvoiceId}}/reject",
+              "raw": "{{baseUrl}}/api/procurement/invoices/{{lastInvoiceId}}/reject",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "api",
@@ -1891,33 +1882,13 @@
             "method": "GET",
             "url": {
               "raw": "{{base_url}}/api/procurement/cash-purchases?page=1&limit=10",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "procurement",
-                "cash-purchases"
-              ],
+              "host": ["{{base_url}}"],
+              "path": ["api", "procurement", "cash-purchases"],
               "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "status",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "search",
-                  "value": "",
-                  "disabled": true
-                }
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"},
+                {"key": "status", "value": "", "disabled": true},
+                {"key": "search", "value": "", "disabled": true}
               ]
             },
             "header": [
@@ -1973,44 +1944,965 @@
       ]
     },
     {
-      "name": "Files",
+      "name": "Machinery",
       "item": [
         {
-          "name": "Preview File",
+          "name": "Get Machinery Options",
           "request": {
             "method": "GET",
+            "url": "{{base_url}}/api/procurement/machinery/options",
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{token}}"
               }
+            ]
+          }
+        },
+        {
+          "name": "Create Machinery Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.id) { pm.collectionVariables.set('lastMachineryReqId', json.results.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/machinery-requests",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"siteId\": \"SITE-001\",\n  \"justification\": \"New excavator required for Phase 2 construction work\",\n  \"items\": [\n    { \"machineName\": \"Excavator\", \"quantity\": 1, \"requestType\": \"new\" },\n    { \"machineName\": \"Generator\", \"quantity\": 2, \"requestType\": \"replacement\", \"oldAssetId\": \"AST-001\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "List Machinery Requests",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/machinery-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Request Details for Approval",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/machinery-requests/{{lastMachineryReqId}}/details-for-approval",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Fulfill Machinery Request (creates PO)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.poNumber) { pm.collectionVariables.set('lastMachineryPoNumber', json.results.poNumber); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/machinery-requests/{{lastMachineryReqId}}/fulfill",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorId\": \"{{lastVendorCode}}\",\n  \"expectedDeliveryDate\": \"2026-04-30\",\n  \"region\": \"West\",\n  \"items\": [\n    { \"machineName\": \"Excavator\", \"quantity\": 1, \"landedPrice\": 450000 },\n    { \"machineName\": \"Generator\", \"quantity\": 2, \"landedPrice\": 85000 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject Machinery Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/machinery-requests/{{lastMachineryReqId}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Budget not approved for this quarter\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Vendor Machinery Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/vendor/machinery-orders",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Machinery PO",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/machinery/{{lastMachineryPoNumber}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Machinery PO Delivery",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/procurement/purchase-orders/machinery/{{lastMachineryPoNumber}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Dispatched\",\n  \"deliveryType\": \"Courier\",\n  \"courierName\": \"FedEx\",\n  \"podNumber\": \"FX-9988\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Machinery GRN",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/machinery/{{lastMachineryPoNumber}}/grn",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"signedDcUrl\": \"minio/machinery/signed-dc.pdf\",\n  \"assetConditionProofUrl\": \"minio/machinery/condition-proof.jpg\",\n  \"packagingImages\": [\"minio/machinery/pkg1.jpg\", \"minio/machinery/pkg2.jpg\"],\n  \"comments\": \"All items received in good condition\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Machinery GRN Evidence",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/machinery/grn/{{lastMachineryPoNumber}}/evidence",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Consolidated Machinery Items",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/machinery/consolidated-items",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"poNumbers\": [\"{{lastMachineryPoNumber}}\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Machinery Invoice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.results && json.results.id) { pm.collectionVariables.set('lastMachineryInvoiceId', json.results.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/consolidated/machinery",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceNo\": \"MAC-INV-2026-001\",\n  \"state\": \"Maharashtra\",\n  \"billAmount\": 620000,\n  \"billUrl\": \"minio/invoices/mac-inv-2026-001.pdf\",\n  \"poNumbers\": [\"{{lastMachineryPoNumber}}\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "List Machinery Invoice Approvals",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/invoices/machinery/approval-list",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Approve Machinery Invoice",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/machinery/approve",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceId\": \"{{lastMachineryInvoiceId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reject Machinery Invoice",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/machinery/{{lastMachineryInvoiceId}}/reject",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Bill amount does not match delivery note\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Requestor Machinery Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/requestor/machinery-orders",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Export All Machinery Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/vendor/machinery-orders/export-all",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Uniforms",
+      "item": [
+        {
+          "name": "01 \u00e2\u20ac\u201d Employee Search",
+          "request": {
+            "method": "GET",
             "url": {
-              "raw": "{{base_url}}/api/procurement/files/preview?path=smarterp-procurement/vendor-applications/VEN0000001/panNo.pdf",
+              "raw": "{{base_url}}/api/procurement/employees/uniform-search?q=Rahul",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "procurement",
-                "files",
-                "preview"
+                "employees",
+                "uniform-search"
               ],
               "query": [
                 {
-                  "key": "path",
-                  "value": "smarterp-procurement/vendor-applications/VEN0000001/panNo.pdf",
-                  "description": "File path as stored in DB"
-                },
-                {
-                  "key": "download",
-                  "value": "false",
-                  "description": "Set to true to force download instead of preview",
-                  "disabled": true
+                  "key": "q",
+                  "value": "Rahul"
                 }
               ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has results', () => pm.expect(j.results).to.be.an('array').and.lengthOf.at.least(1));",
+                  "console.log('Employee search count:', j.results.length, '| first:', j.results[0]?.employeeName);"
+                ],
+                "type": "text/javascript"
+              }
             }
-          }
+          ]
+        },
+        {
+          "name": "02 \u00e2\u20ac\u201d Uniform Configuration",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/uniforms/configuration",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has itemTypes', () => pm.expect(j.results.itemTypes).to.be.an('array').and.lengthOf.at.least(1));",
+                  "console.log('Item types count:', j.results.itemTypes.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 \u00e2\u20ac\u201d Create Uniform Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/uniform-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeCode\": \"EMP-001\",\n  \"employeeName\": \"Priya Singh\",\n  \"designation\": \"Supervisor\",\n  \"site\": \"SITE-001\",\n  \"client\": \"ABC Corp\",\n  \"issueType\": \"new\",\n  \"isEarlyReplacement\": false,\n  \"items\": [\n    { \"itemName\": \"Shirt\", \"size\": \"M\", \"quantity\": 2 },\n    { \"itemName\": \"Trouser\", \"size\": \"32\", \"quantity\": 2 },\n    { \"itemName\": \"Safety Shoes\", \"size\": \"8\", \"quantity\": 1 }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has requestId', () => pm.expect(j.results.requestId).to.match(/^UNF-/));",
+                  "pm.collectionVariables.set('lastUniformReqId', j.results.id);",
+                  "console.log('requestId:', j.results.requestId, '| id:', j.results.id, '| items:', j.results.items.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 \u00e2\u20ac\u201d List Uniform Requests",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/uniform-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('Uniform requests count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 \u00e2\u20ac\u201d Employee Uniform History",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/employees/EMP-001/uniform-history",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('History count for EMP-001:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 \u00e2\u20ac\u201d Fulfill Uniform Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/uniform-requests/{{lastUniformReqId}}/fulfill",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vendorId\": \"{{lastVendorCode}}\",\n  \"expectedDeliveryDate\": \"2026-04-15\",\n  \"region\": \"West\",\n  \"items\": [\n    { \"itemName\": \"Shirt\",        \"size\": \"M\",  \"quantity\": 2, \"landedPrice\": 450.00 },\n    { \"itemName\": \"Trouser\",      \"size\": \"32\", \"quantity\": 2, \"landedPrice\": 650.00 },\n    { \"itemName\": \"Safety Shoes\", \"size\": \"8\",  \"quantity\": 1, \"landedPrice\": 1200.00 }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has poNumber', () => pm.expect(j.results.poNumber).to.match(/^PO-UNF-/));",
+                  "pm.collectionVariables.set('lastUniformPoNumber', j.results.poNumber);",
+                  "console.log('poNumber:', j.results.poNumber, '| employee:', j.results.employeeName, '| status:', j.results.status);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 \u00e2\u20ac\u201d List Vendor Uniform POs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('Uniform POs count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 \u00e2\u20ac\u201d Get Single Uniform PO",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/{{lastUniformPoNumber}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Correct PO', () => pm.expect(j.results.poNumber).to.equal(pm.collectionVariables.get('lastUniformPoNumber')));",
+                  "console.log('PO items:', j.results.items.length, '| site:', j.results.siteName, '| status:', j.results.status);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 \u00e2\u20ac\u201d Update Uniform PO Delivery",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/{{lastUniformPoNumber}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Transit\",\n  \"deliveryType\": \"Courier\",\n  \"courierName\": \"Delhivery\",\n  \"podNumber\": \"DEL-9988776655\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Status updated', () => pm.expect(j.results.status).to.equal('In Transit'));",
+                  "console.log('status:', j.results.status, '| courier:', j.results.courierName, '| pod:', j.results.podNumber);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 \u00e2\u20ac\u201d Submit Uniform GRN",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/{{lastUniformPoNumber}}/grn",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"signedDcUrl\": \"https://storage.example.com/uniform-dc/signed-dc-001.pdf\",\n  \"comments\": \"All items received in good condition\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.test('Status Delivered', () => pm.expect(j.results.status).to.equal('Delivered'));",
+                  "console.log('GRN submitted | status:', j.results.status, '| dateOfDelivery:', j.results.dateOfDelivery);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 \u00e2\u20ac\u201d Requestor Uniform Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/requestor/uniform-orders",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "console.log('Requestor uniform orders count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 \u00e2\u20ac\u201d Get Consolidated Uniform Items",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/consolidated-items",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"poNumbers\": [\"{{lastUniformPoNumber}}\"] }"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has items', () => pm.expect(j.results).to.be.an('array').and.lengthOf.at.least(1));",
+                  "console.log('Consolidated items:', j.results.length, '| first:', j.results[0]?.itemName);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 \u00e2\u20ac\u201d Submit Uniform Invoice",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/invoices/consolidated",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceNo\": \"UNFINV-2026-001\",\n  \"state\": \"Maharashtra\",\n  \"billAmount\": 3750.00,\n  \"billUrl\": \"https://storage.example.com/invoices/unf-invoice-001.pdf\",\n  \"poNumbers\": [\"{{lastUniformPoNumber}}\"]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is uniform invoice', () => pm.expect(j.results.invoiceType).to.equal('uniform'));",
+                  "pm.collectionVariables.set('lastUniformInvoiceId', j.results.id);",
+                  "console.log('invoiceId:', j.results.invoiceId, '| type:', j.results.invoiceType, '| status:', j.results.status);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 \u00e2\u20ac\u201d Export All Uniform POs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/export-all",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('Export all uniform POs | Content-Type:', pm.response.headers.get('Content-Type'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 \u00e2\u20ac\u201d Export Requestor Uniform Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/requestor/uniform-orders/export",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('Export requestor uniform orders | Content-Type:', pm.response.headers.get('Content-Type'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "16 \u00e2\u20ac\u201d Export Single Uniform PO",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/purchase-orders/uniform/{{lastUniformPoNumber}}/export",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('Export single uniform PO | Content-Type:', pm.response.headers.get('Content-Type'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "17 \u00e2\u20ac\u201d Reject Uniform Request (New)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/uniform-requests/{{lastUniformReqId}}/reject",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"rejectionReason\": \"Replacement cycle not completed. Minimum 12 months required.\" }"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// NOTE: This creates a fresh request and rejects it.",
+                  "// Run 'Create Uniform Request' separately before running this to get a fresh ID.",
+                  "// The lastUniformReqId must be in PENDING_PH_APPROVAL status."
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Status REJECTED', () => pm.expect(j.results.status).to.equal('REJECTED'));",
+                  "pm.test('Has rejectionReason', () => pm.expect(j.results.rejectionReason).to.be.a('string'));",
+                  "console.log('status:', j.results.status, '| reason:', j.results.rejectionReason);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "01 \u00e2\u20ac\u201d List Notifications",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/procurement/notifications",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Is array', () => pm.expect(j.results).to.be.an('array'));",
+                  "if (j.results.length > 0) {",
+                  "    pm.collectionVariables.set('lastNotificationId', j.results[0].id);",
+                  "}",
+                  "console.log('Notifications count:', j.results.length);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 \u00e2\u20ac\u201d Mark As Read",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/procurement/notifications/mark-as-read",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"ids\": [] }"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "var j = pm.response.json();",
+                  "pm.test('Has marked count', () => pm.expect(j.results).to.have.property('marked'));",
+                  "console.log('Marked as read:', j.results.marked);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         }
       ]
     }
