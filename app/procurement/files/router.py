@@ -15,15 +15,18 @@ _EXT_TO_CONTENT_TYPE = {
 }
 
 
-@router.get("/preview")
+@router.get("/preview/{file_path:path}")
 async def preview_file(
-    path: str = Query(..., min_length=1, description="File path as stored in DB (with or without bucket prefix)"),
+    file_path: str,
     download: bool = Query(False, description="Set to true to force download instead of inline preview"),
     _user: dict = Depends(get_current_user),
 ):
     # Strip bucket prefix if present (DB stores "smarterp-procurement/vendor-apps/...", MinIO expects "vendor-apps/...")
     bucket_prefix = f"{settings.minio_bucket}/"
-    object_name = path[len(bucket_prefix):] if path.startswith(bucket_prefix) else path
+    object_name = file_path[len(bucket_prefix):] if file_path.startswith(bucket_prefix) else file_path
+
+    if not object_name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File path is required")
 
     ext = object_name.rsplit(".", 1)[-1].lower() if "." in object_name else ""
     content_type = _EXT_TO_CONTENT_TYPE.get(ext, "application/octet-stream")
@@ -31,7 +34,7 @@ async def preview_file(
     try:
         data = download_file(object_name)
     except Exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"File not found: {path}")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"File not found: {file_path}")
 
     filename = object_name.rsplit("/", 1)[-1] if "/" in object_name else object_name
     disposition = "attachment" if download else "inline"

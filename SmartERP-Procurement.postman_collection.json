@@ -1986,7 +1986,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/procurement/files/preview?path=smarterp-procurement/vendor-applications/VEN0000001/panNo.pdf",
+              "raw": "{{base_url}}/api/procurement/files/preview/vendor-applications/VEN0000001/panNo.pdf",
               "host": [
                 "{{base_url}}"
               ],
@@ -1994,14 +1994,12 @@
                 "api",
                 "procurement",
                 "files",
-                "preview"
+                "preview",
+                "vendor-applications",
+                "VEN0000001",
+                "panNo.pdf"
               ],
               "query": [
-                {
-                  "key": "path",
-                  "value": "smarterp-procurement/vendor-applications/VEN0000001/panNo.pdf",
-                  "description": "File path as stored in DB"
-                },
                 {
                   "key": "download",
                   "value": "false",
