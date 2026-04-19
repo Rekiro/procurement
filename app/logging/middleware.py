@@ -11,10 +11,11 @@ from starlette.responses import Response
 
 from app.config import settings
 from app.database import async_session
-from app.logging.models import ProcApiLog
+from app.logging.models import ApiLog
 
 logger = logging.getLogger(__name__)
 
+MODULE_NAME = "PROCUREMENT"
 SKIP_PATHS = {"/procurement/health", "/procurement/docs", "/procurement/redoc", "/procurement/openapi.json", "/api/procurement/auth/login"}
 
 
@@ -28,7 +29,8 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
         full_path = path + ("?" + query if query else "")
         client_ip = _extract_client_ip(request)
-        user_email, user_role = _extract_jwt_claims(request)
+        user_id, user_role = _extract_jwt_claims(request)
+        user_agent = request.headers.get("user-agent")
         request_body = await _read_request_body(request)
 
         start = time.monotonic()
@@ -37,24 +39,26 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
         response, response_body = await _capture_response_body(response)
 
-        response_id = None
+        request_id = None
         if response_body and isinstance(response_body.get("responseId"), str):
             try:
-                response_id = uuid.UUID(response_body["responseId"])
+                request_id = uuid.UUID(response_body["responseId"])
             except ValueError:
                 pass
 
         asyncio.create_task(_persist_log(
+            module=MODULE_NAME,
+            request_id=request_id,
             method=request.method,
             path=full_path,
             status_code=response.status_code,
-            user_email=user_email,
+            duration_ms=duration_ms,
+            user_id=user_id,
             user_role=user_role,
+            ip_address=client_ip,
+            user_agent=user_agent,
             request_body=request_body,
             response_body=response_body,
-            duration_ms=duration_ms,
-            client_ip=client_ip,
-            response_id=response_id,
         ))
 
         return response
@@ -68,6 +72,10 @@ def _extract_client_ip(request: Request) -> str | None:
 
 
 def _extract_jwt_claims(request: Request) -> tuple[str | None, str | None]:
+    """Extract (user_id, role) from the bearer token. Procurement currently puts
+    an email in the `sub` claim — that gets stored in `user_id` until procurement
+    migrates to the shared users table. The String(20) column accommodates both
+    formats (e.g. 'admin@smart.com', 'ADM0000001')."""
     auth_header = request.headers.get("authorization", "")
     if not auth_header.startswith("Bearer "):
         return None, None
@@ -118,7 +126,7 @@ async def _capture_response_body(response: Response) -> tuple[Response, dict | N
 async def _persist_log(**kwargs) -> None:
     try:
         async with async_session() as session:
-            session.add(ProcApiLog(**kwargs))
+            session.add(ApiLog(**kwargs))
             await session.commit()
     except Exception as exc:
         logger.error("Failed to persist API log: %s", exc)

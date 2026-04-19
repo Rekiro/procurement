@@ -13,8 +13,11 @@ from alembic import context
 from app.config import settings
 from app.database import Base
 
-# Import all proc_* models so Alembic detects them
-from app.logging.models import ProcApiLog  # noqa: F401
+# Import all proc_* models so Alembic detects them.
+# Note: the shared `api_logs` table (ApiLog) is owned by accountMaster's
+# alembic chain. It's imported here only so SQLAlchemy ORM can use it; the
+# `include_object` filter below excludes it from procurement's autogenerate.
+from app.logging.models import ApiLog  # noqa: F401
 from app.procurement.vendors.models import ProcVendor, ProcVendorApplication  # noqa: F401
 from app.procurement.products.models import ProcProduct, ProcProductPriceChangeRequest  # noqa: F401
 from app.procurement.extra_material_requests.models import ProcExtraMaterialRequest  # noqa: F401
@@ -34,16 +37,47 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
+# Procurement shares the smarterp DB with account-master, accounts, payroll,
+# and survey. Each of those lives in its own schema. Procurement's own tables
+# (proc_*) still live in public for now. Autogenerate must only consider
+# tables in schemas this app owns, otherwise it would propose dropping
+# sibling apps' tables.
+OWNED_SCHEMAS = {"public"}
+# Tables in `public` that are NOT owned by procurement (none today — the
+# shared tables moved to the `shared` schema).
+EXTERNAL_TABLES_IN_PUBLIC: set[str] = set()
+
+
+def include_object(object_, name, type_, reflected, compare_to):
+    if type_ == "table":
+        schema = getattr(object_, "schema", None) or "public"
+        if schema not in OWNED_SCHEMAS:
+            return False
+        if name in EXTERNAL_TABLES_IN_PUBLIC:
+            return False
+    return True
+
 
 def run_migrations_offline() -> None:
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        include_object=include_object,
+        include_schemas=True,
+    )
     with context.begin_transaction():
         context.run_migrations()
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        include_object=include_object,
+        include_schemas=True,
+    )
     with context.begin_transaction():
         context.run_migrations()
 

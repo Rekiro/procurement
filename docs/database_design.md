@@ -55,32 +55,39 @@ proc_uniform_requests
   └── proc_uniform_purchase_orders (uniform_request_id FK)
 
 proc_notifications              (standalone per user_email)
-proc_api_logs                   (standalone middleware log)
+api_logs                        (SHARED — owned by accountMaster; written by all backend apps)
 ```
 
 ---
 
 ## Table Designs
 
-### `proc_api_logs`
-Auto-populated by `RequestLoggingMiddleware` on every API call.
+### `api_logs` (shared, owned by accountMaster)
+Auto-populated by `RequestLoggingMiddleware` on every API call. The same table
+is written to by procurement, account-master, and accounts — each row carries
+a `module` discriminator. Migration `0010_migrate_proc_api_logs_to_shared.py`
+copied the historical `proc_api_logs` rows into this table and dropped the
+old per-app table.
 
 | Column | Type | Constraints | Notes |
 |---|---|---|---|
-| id | UUID | PK | auto-generated |
+| id | BIGSERIAL | PK | autoincrement |
+| module | VARCHAR(30) | NOT NULL | PROCUREMENT / ACCOUNT_MASTER / ACCOUNTS |
+| request_id | UUID | nullable | from ApiResponse.responseId |
 | timestamp | TIMESTAMPTZ | NOT NULL, default now() | |
 | method | VARCHAR(10) | NOT NULL | GET/POST/PUT/DELETE |
 | path | VARCHAR(2048) | NOT NULL | includes query string |
 | status_code | INTEGER | NOT NULL | HTTP response code |
-| user_email | VARCHAR(255) | nullable | from JWT |
+| duration_ms | INTEGER | NOT NULL | |
+| user_id | VARCHAR(20) | nullable | JWT `sub`. Procurement currently puts an email here pending its switch to the shared users table. |
 | user_role | VARCHAR(50) | nullable | from JWT |
+| ip_address | VARCHAR(50) | nullable | supports IPv6 |
+| user_agent | VARCHAR(500) | nullable | from `User-Agent` header |
 | request_body | JSONB | nullable | JSON payloads only |
 | response_body | JSONB | nullable | JSON responses only |
-| duration_ms | INTEGER | NOT NULL | |
-| client_ip | VARCHAR(45) | nullable | supports IPv6 |
-| response_id | UUID | nullable | from ApiResponse.responseId |
+| error | TEXT | nullable | unhandled exception text, if any |
 
-**Indexes:** `timestamp`, `user_email`, `response_id`
+**Indexes:** `(module, timestamp)`, `(user_id, timestamp)`, `(path, status_code)`
 
 ---
 

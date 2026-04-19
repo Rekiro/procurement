@@ -137,7 +137,7 @@ Vendors split: `vendors_router` at `/vendors`, `applications_router` at `/vendor
 | machinery_requests | proc_machinery_requests, proc_machinery_purchase_orders, proc_machinery_grns | MREQ0000001 |
 | uniform_requests | proc_uniform_requests, proc_uniform_purchase_orders | UNF0000001 |
 | notifications | proc_notifications | — |
-| logging | proc_api_logs (auto via middleware) | — |
+| logging | api_logs (SHARED, owned by accountMaster; auto via middleware with module="PROCUREMENT") | — |
 | extra_material_requests | proc_extra_material_requests | — |
 | sites | no tables (queries commercial data) | — |
 
