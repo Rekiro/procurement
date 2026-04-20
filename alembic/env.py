@@ -47,6 +47,11 @@ OWNED_SCHEMAS = {"public"}
 # shared tables moved to the `shared` schema).
 EXTERNAL_TABLES_IN_PUBLIC: set[str] = set()
 
+# Procurement's migration history is tracked in its own alembic version table
+# so it doesn't collide with commercial-backend's default `alembic_version`
+# in the same database.
+VERSION_TABLE = "alembic_version_procurement"
+
 
 def include_object(object_, name, type_, reflected, compare_to):
     if type_ == "table":
@@ -64,6 +69,7 @@ def run_migrations_offline() -> None:
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
+        version_table=VERSION_TABLE,
         include_object=include_object,
         include_schemas=True,
     )
@@ -75,6 +81,7 @@ def do_run_migrations(connection):
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
+        version_table=VERSION_TABLE,
         include_object=include_object,
         include_schemas=True,
     )
