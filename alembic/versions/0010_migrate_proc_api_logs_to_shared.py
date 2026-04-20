@@ -49,19 +49,19 @@ def upgrade() -> None:
     exists = bind.execute(
         sa.text(
             "SELECT 1 FROM information_schema.tables "
-            "WHERE table_schema='public' AND table_name='api_logs'"
+            "WHERE table_schema='shared' AND table_name='api_logs'"
         )
     ).scalar()
     if not exists:
         raise RuntimeError(
-            "Cannot migrate proc_api_logs: shared `api_logs` table is missing. "
+            "Cannot migrate proc_api_logs: shared.api_logs table is missing. "
             "Run accountMaster's alembic upgrade first "
             "(cd accountMaster && alembic upgrade head)."
         )
 
     op.execute(
         """
-        INSERT INTO api_logs (
+        INSERT INTO shared.api_logs (
             module, request_id, timestamp, method, path, status_code,
             duration_ms, user_id, user_role, ip_address, user_agent,
             request_body, response_body, error
@@ -139,9 +139,9 @@ def downgrade() -> None:
             duration_ms,
             ip_address         AS client_ip,
             request_id         AS response_id
-        FROM api_logs
+        FROM shared.api_logs
         WHERE module = 'PROCUREMENT'
         ORDER BY timestamp
         """
     )
-    op.execute("DELETE FROM api_logs WHERE module = 'PROCUREMENT'")
+    op.execute("DELETE FROM shared.api_logs WHERE module = 'PROCUREMENT'")
