@@ -1,5 +1,6 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func
@@ -102,7 +103,7 @@ async def fulfill_uniform_request(db: AsyncSession, request_id: uuid.UUID,
     if not vendor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor not found")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(IST)
     count = await db.scalar(select(func.count()).select_from(ProcUniformPurchaseOrder))
     po_number = f"PO-UNF-{(count or 0) + 1:05d}"
 
@@ -113,7 +114,7 @@ async def fulfill_uniform_request(db: AsyncSession, request_id: uuid.UUID,
             data.expectedDeliveryDate.year,
             data.expectedDeliveryDate.month,
             data.expectedDeliveryDate.day,
-            tzinfo=timezone.utc,
+            tzinfo=IST,
         )
         tat = (data.expectedDeliveryDate - now.date()).days
 
@@ -151,7 +152,7 @@ async def reject_uniform_request(db: AsyncSession, request_id: uuid.UUID,
 
     req.status = "REJECTED"
     req.rejection_reason = data.rejectionReason
-    req.updated_at = datetime.now(timezone.utc)
+    req.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(req)
     return req
@@ -182,7 +183,7 @@ async def update_uniform_po(db: AsyncSession, po_number: str, data: UniformPoUpd
     if data.status is not None:
         po.status = data.status
         if data.status == "Delivered":
-            po.date_of_delivery = datetime.now(timezone.utc)
+            po.date_of_delivery = datetime.now(IST)
     if data.deliveryType is not None:
         po.delivery_type = data.deliveryType
     if data.courierName is not None:
@@ -190,7 +191,7 @@ async def update_uniform_po(db: AsyncSession, po_number: str, data: UniformPoUpd
     if data.podNumber is not None:
         po.pod_number = data.podNumber
 
-    po.updated_at = datetime.now(timezone.utc)
+    po.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(po)
     return po
@@ -204,9 +205,9 @@ async def submit_uniform_grn(db: AsyncSession, po_number: str, data: UniformGrnC
                             detail="GRN already submitted for this PO")
 
     po.status = "Delivered"
-    po.date_of_delivery = datetime.now(timezone.utc)
+    po.date_of_delivery = datetime.now(IST)
     po.signed_dc_url = data.signedDcUrl
-    po.updated_at = datetime.now(timezone.utc)
+    po.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(po)
     return po
@@ -254,7 +255,7 @@ async def submit_uniform_invoice(db: AsyncSession, data: UniformInvoiceCreate,
         )
         if po:
             po.status = "INVOICE_SUBMITTED"
-            po.updated_at = datetime.now(timezone.utc)
+            po.updated_at = datetime.now(IST)
 
     await db.commit()
     return invoice, data.poNumbers

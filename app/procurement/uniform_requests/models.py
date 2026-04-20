@@ -1,11 +1,12 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import String, DateTime, Boolean, Integer
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+from app.shared.timezone import IST
 
 
 class ProcUniformRequest(Base):
@@ -26,12 +27,12 @@ class ProcUniformRequest(Base):
     status: Mapped[str] = mapped_column(String(40), nullable=False, default="PENDING_PH_APPROVAL")
     rejection_reason: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(IST)
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False,
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(IST),
+        onupdate=lambda: datetime.now(IST),
     )
 
 
@@ -61,10 +62,10 @@ class ProcUniformPurchaseOrder(Base):
     signed_dc_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     items: Mapped[list] = mapped_column(JSONB, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(IST)
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False,
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(IST),
+        onupdate=lambda: datetime.now(IST),
     )

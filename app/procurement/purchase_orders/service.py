@@ -1,6 +1,7 @@
 import math
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func, or_, cast, String
@@ -331,7 +332,7 @@ async def update_purchase_order(
     # --- Validations ---
 
     # Date cannot be in the future
-    if data.dateOfDelivery and data.dateOfDelivery.date() > datetime.now(timezone.utc).date():
+    if data.dateOfDelivery and data.dateOfDelivery.date() > datetime.now(IST).date():
         raise HTTPException(status_code=400, detail="dateOfDelivery cannot be a future date")
 
     # "Delivered" status requires all documents
@@ -393,7 +394,7 @@ async def update_purchase_order(
     if signed_dc_url:
         po.signed_dc_url = signed_dc_url
 
-    po.updated_at = datetime.now(timezone.utc)
+    po.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(po)
     return po
@@ -454,7 +455,7 @@ async def submit_grn(
 
     # GRN submission changes PO status to GRN_SUBMITTED
     po.status = "GRN_SUBMITTED"
-    po.updated_at = datetime.now(timezone.utc)
+    po.updated_at = datetime.now(IST)
 
     await db.commit()
     return grn

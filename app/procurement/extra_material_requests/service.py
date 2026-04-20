@@ -1,5 +1,6 @@
 import math
-from datetime import datetime, timezone
+from datetime import datetime
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func, extract, cast, String
@@ -20,13 +21,13 @@ def _parse_month_year(s: str) -> datetime:
     for fmt in ("%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
         try:
             dt = datetime.strptime(s, fmt)
-            return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
+            return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=IST)
         except ValueError:
             continue
     # Try YYYY-MM
     try:
         dt = datetime.strptime(s + "-01", "%Y-%m-%d")
-        return dt.replace(tzinfo=timezone.utc)
+        return dt.replace(tzinfo=IST)
     except ValueError:
         pass
     raise HTTPException(
@@ -36,7 +37,7 @@ def _parse_month_year(s: str) -> datetime:
 
 
 async def _next_emr_id(db: AsyncSession) -> str:
-    year = datetime.now(timezone.utc).year
+    year = datetime.now(IST).year
     year_count = await db.scalar(
         select(func.count()).select_from(ProcExtraMaterialRequest).where(
             extract("year", ProcExtraMaterialRequest.created_at) == year
@@ -51,7 +52,7 @@ async def get_status(db: AsyncSession, requestor_email: str, site_id: str) -> di
     if not site:
         raise HTTPException(status_code=404, detail=f"Site '{site_id}' not found")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(IST)
     result = await db.execute(
         select(ProcExtraMaterialRequest)
         .where(ProcExtraMaterialRequest.requestor_email == requestor_email)
@@ -181,7 +182,7 @@ async def approve_requests(
     for emr in emrs:
         emr.status = "approved"
         emr.approved_by = approved_by
-        emr.reviewed_at = datetime.now(timezone.utc)
+        emr.reviewed_at = datetime.now(IST)
 
     await db.commit()
     return emrs
@@ -204,7 +205,7 @@ async def reject_request(
     emr.status = "rejected"
     emr.rejection_reason = data.reason
     emr.approved_by = reviewed_by
-    emr.reviewed_at = datetime.now(timezone.utc)
+    emr.reviewed_at = datetime.now(IST)
     await db.commit()
     await db.refresh(emr)
     return emr

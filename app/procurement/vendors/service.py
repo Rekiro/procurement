@@ -1,5 +1,6 @@
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func, or_
@@ -169,14 +170,14 @@ async def approve_vendor_applications(
         approved_count = await db.scalar(
             select(func.count()).select_from(ProcVendor).where(ProcVendor.status == "ACTIVE")
         )
-        gl_code = f"GL{datetime.now(timezone.utc).year}{(approved_count or 0) + 1:07d}"
+        gl_code = f"GL{datetime.now(IST).year}{(approved_count or 0) + 1:07d}"
 
         vendor.status = "ACTIVE"
         vendor.gl_code = gl_code
         vendor.invite_token = None
 
         application.status = "Approved"
-        application.reviewed_at = datetime.now(timezone.utc)
+        application.reviewed_at = datetime.now(IST)
         application.reviewed_by = reviewed_by
 
         approved.append(application)
@@ -198,7 +199,7 @@ async def reject_vendor_application(db: AsyncSession, vendor_code: str, data: Re
 
     application.status = "Rejected"
     application.rejection_reason = data.reason
-    application.reviewed_at = datetime.now(timezone.utc)
+    application.reviewed_at = datetime.now(IST)
     application.reviewed_by = reviewed_by
 
     await db.commit()

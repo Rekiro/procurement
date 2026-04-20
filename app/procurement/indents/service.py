@@ -1,6 +1,7 @@
 import math
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func, or_, cast, String
@@ -16,7 +17,7 @@ from app.procurement.purchase_orders.models import ProcPurchaseOrder, ProcPoItem
 
 
 async def _next_tracking_no(db: AsyncSession) -> str:
-    year = datetime.now(timezone.utc).year
+    year = datetime.now(IST).year
     count = await db.scalar(select(func.count()).select_from(ProcIndent)) or 0
     return f"IND/{year}/{count + 1:05d}"
 
@@ -313,7 +314,7 @@ async def update_indent(
     indent.request_category = data.requestCategory
     indent.narration = data.narration
     indent.total_value = total_value
-    indent.updated_at = datetime.now(timezone.utc)
+    indent.updated_at = datetime.now(IST)
 
     # Replace items
     existing_items = await db.execute(
@@ -369,7 +370,7 @@ async def _create_pos_for_indent(db: AsyncSession, indent: ProcIndent) -> list[s
         vendor_code = prod.vendor_code if prod else "UNKNOWN"
         vendor_groups.setdefault(vendor_code, []).append(item)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(IST)
     po_numbers = []
 
     for vendor_code, vendor_items in vendor_groups.items():
@@ -439,7 +440,7 @@ async def approve_indent(
             indent.status = "PO_CREATED"
 
         indent.approved_by = approved_by
-        indent.updated_at = datetime.now(timezone.utc)
+        indent.updated_at = datetime.now(IST)
         results.append({
             "trackingNo": indent.tracking_no,
             "status": indent.status,
@@ -462,7 +463,7 @@ async def reject_indent(
     indent.status = "REJECTED_BY_PH" if indent.status == "PENDING_PH_APPROVAL" else "REJECTED_BY_RM"
     indent.rejection_reason = data.reason
     indent.rejected_by = rejected_by
-    indent.updated_at = datetime.now(timezone.utc)
+    indent.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(indent)
     return indent

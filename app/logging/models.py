@@ -7,13 +7,14 @@ table is excluded from procurement's autogenerate via env.py's
 `include_object` filter.
 """
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import String, Integer, DateTime, BigInteger, Index, Text
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+from app.shared.timezone import IST
 
 
 class ApiLog(Base):
@@ -23,7 +24,7 @@ class ApiLog(Base):
     module: Mapped[str] = mapped_column(String(30), nullable=False)
     request_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(IST)
     )
     method: Mapped[str] = mapped_column(String(10), nullable=False)
     path: Mapped[str] = mapped_column(String(2048), nullable=False)

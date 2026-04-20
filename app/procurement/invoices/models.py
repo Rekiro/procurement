@@ -1,11 +1,12 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import String, DateTime, Numeric
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+from app.shared.timezone import IST
 
 
 class ProcInvoice(Base):
@@ -22,7 +23,7 @@ class ProcInvoice(Base):
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="Pending")
     rejection_reason: Mapped[str | None] = mapped_column(String, nullable=True)
     submitted_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(IST)
     )
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     reviewed_by: Mapped[str | None] = mapped_column(String(255), nullable=True)

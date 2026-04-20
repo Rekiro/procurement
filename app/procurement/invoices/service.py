@@ -1,6 +1,7 @@
 import math
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func, or_, distinct
@@ -108,7 +109,7 @@ async def submit_invoice(db: AsyncSession, data: InvoiceSubmitData, bill_url: st
         )
         if linked_po:
             linked_po.status = "INVOICE_SUBMITTED"
-            linked_po.updated_at = datetime.now(timezone.utc)
+            linked_po.updated_at = datetime.now(IST)
 
     await db.commit()
     po_numbers = await get_invoice_po_numbers(db, invoice.id)
@@ -346,7 +347,7 @@ async def approve_invoices(db: AsyncSession, invoice_ids: list[str], reviewed_by
         if inv.status != "Pending":
             continue
         inv.status = "Approved"
-        inv.reviewed_at = datetime.now(timezone.utc)
+        inv.reviewed_at = datetime.now(IST)
         inv.reviewed_by = reviewed_by
         approved.append(inv)
 
@@ -367,7 +368,7 @@ async def reject_invoice(
 
     invoice.status = "Rejected"
     invoice.rejection_reason = data.reason
-    invoice.reviewed_at = datetime.now(timezone.utc)
+    invoice.reviewed_at = datetime.now(IST)
     invoice.reviewed_by = reviewed_by
     await db.commit()
     await db.refresh(invoice)

@@ -1,5 +1,6 @@
 import math
-from datetime import datetime, timezone
+from datetime import datetime
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func, cast, String, or_
@@ -18,12 +19,12 @@ def _parse_for_the_month(s: str) -> datetime:
     for fmt in ("%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"):
         try:
             dt = datetime.strptime(s, fmt)
-            return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
+            return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=IST)
         except ValueError:
             continue
     try:
         dt = datetime.strptime(s + "-01", "%Y-%m-%d")
-        return dt.replace(tzinfo=timezone.utc)
+        return dt.replace(tzinfo=IST)
     except ValueError:
         pass
     raise HTTPException(
@@ -123,7 +124,7 @@ async def approve_cash_purchases(
             detail=f"Cash purchases not in Pending status: {', '.join(sorted(not_pending))}",
         )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(IST)
     for purchase in purchases:
         purchase.status = "Approved"
         purchase.updated_at = now
@@ -146,7 +147,7 @@ async def reject_cash_purchase(
 
     purchase.status = "Rejected"
     purchase.rejection_reason = data.reason
-    purchase.updated_at = datetime.now(timezone.utc)
+    purchase.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(purchase)
     return purchase

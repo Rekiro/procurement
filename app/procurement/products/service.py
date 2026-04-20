@@ -1,6 +1,7 @@
 import io
 import math
-from datetime import datetime, timezone, date
+from datetime import datetime, date
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func
@@ -111,7 +112,7 @@ async def approve_products(db: AsyncSession, data: ApproveProductRequest, review
         if product.status != "Pending":
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Product {product_code} is already {product.status}")
         product.status = "Approved"
-        product.updated_at = datetime.now(timezone.utc)
+        product.updated_at = datetime.now(IST)
         approved.append(product)
 
     await db.commit()
@@ -127,7 +128,7 @@ async def reject_product(db: AsyncSession, product_code: str, data: RejectProduc
 
     product.status = "Rejected"
     product.rejection_reason = data.reason
-    product.updated_at = datetime.now(timezone.utc)
+    product.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(product)
     return product
@@ -249,7 +250,7 @@ async def create_price_change_request(db: AsyncSession, data: PriceChangeRequest
             detail=f"A pending price change request already exists for product {data.productId} (approvalId: {existing.id}). Approve or reject it before submitting a new one.",
         )
 
-    approval_id = f"PROD-EDIT-{int(datetime.now(timezone.utc).timestamp() * 1000)}"
+    approval_id = f"PROD-EDIT-{int(datetime.now(IST).timestamp() * 1000)}"
     pcr = ProcProductPriceChangeRequest(
         id=approval_id,
         product_code=data.productId,
@@ -325,7 +326,7 @@ async def approve_price_change_requests(
     if not_pending:
         raise HTTPException(status_code=409, detail=f"Requests not in Pending status: {not_pending}")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(IST)
     for pcr in pcrs:
         # NOTE: spec says schedule price update for wefDate; no scheduler infra yet — applying immediately
         product = await db.get(ProcProduct, pcr.product_code)
@@ -358,7 +359,7 @@ async def reject_price_change_request(
 
     pcr.status = "Rejected"
     pcr.rejection_reason = data.reason
-    pcr.reviewed_at = datetime.now(timezone.utc)
+    pcr.reviewed_at = datetime.now(IST)
     pcr.reviewed_by = reviewed_by
     await db.commit()
     await db.refresh(pcr)
@@ -529,7 +530,7 @@ async def bulk_upload_margins(db: AsyncSession, file_bytes: bytes, filename: str
     # --- Phase 2: apply all updates (all rows already validated) ---
     today = date_type.today()
     updated_products = []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(IST)
 
     for _, product_code, product, margin_pct, margin_amt in valid_rows:
 

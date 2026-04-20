@@ -1,5 +1,6 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
+from app.shared.timezone import IST
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, func
@@ -75,7 +76,7 @@ async def fulfill_machinery_request(db: AsyncSession, request_id: uuid.UUID,
     if not vendor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor not found")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(IST)
     count = await db.scalar(select(func.count()).select_from(ProcMachineryPurchaseOrder))
     po_number = f"PO-MAC-{(count or 0) + 1:05d}"
 
@@ -86,7 +87,7 @@ async def fulfill_machinery_request(db: AsyncSession, request_id: uuid.UUID,
             data.expectedDeliveryDate.year,
             data.expectedDeliveryDate.month,
             data.expectedDeliveryDate.day,
-            tzinfo=timezone.utc,
+            tzinfo=IST,
         )
         tat = (data.expectedDeliveryDate - now.date()).days
 
@@ -122,7 +123,7 @@ async def reject_machinery_request(db: AsyncSession, request_id: uuid.UUID,
 
     req.status = "REJECTED"
     req.rejection_reason = data.rejectionReason
-    req.updated_at = datetime.now(timezone.utc)
+    req.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(req)
     return req
@@ -154,7 +155,7 @@ async def update_machinery_po(db: AsyncSession, po_number: str,
     if data.status is not None:
         po.status = data.status
         if data.status == "Delivered":
-            po.date_of_delivery = datetime.now(timezone.utc)
+            po.date_of_delivery = datetime.now(IST)
     if data.deliveryType is not None:
         po.delivery_type = data.deliveryType
     if data.courierName is not None:
@@ -162,7 +163,7 @@ async def update_machinery_po(db: AsyncSession, po_number: str,
     if data.podNumber is not None:
         po.pod_number = data.podNumber
 
-    po.updated_at = datetime.now(timezone.utc)
+    po.updated_at = datetime.now(IST)
     await db.commit()
     await db.refresh(po)
     return po
@@ -190,9 +191,9 @@ async def submit_machinery_grn(db: AsyncSession, po_number: str,
     db.add(grn)
 
     po.status = "Delivered"
-    po.date_of_delivery = datetime.now(timezone.utc)
+    po.date_of_delivery = datetime.now(IST)
     po.signed_dc_url = data.signedDcUrl
-    po.updated_at = datetime.now(timezone.utc)
+    po.updated_at = datetime.now(IST)
     await db.commit()
     return grn
 
@@ -249,7 +250,7 @@ async def submit_machinery_invoice(db: AsyncSession, data: MachineryInvoiceCreat
         )
         if po:
             po.status = "INVOICE_SUBMITTED"
-            po.updated_at = datetime.now(timezone.utc)
+            po.updated_at = datetime.now(IST)
 
     await db.commit()
     return invoice, data.poNumbers
@@ -275,7 +276,7 @@ async def approve_machinery_invoice(db: AsyncSession, data: ApproveInvoiceReques
                             detail="Invoice is not in Pending status")
 
     invoice.status = "Approved"
-    invoice.reviewed_at = datetime.now(timezone.utc)
+    invoice.reviewed_at = datetime.now(IST)
     invoice.reviewed_by = reviewed_by
     await db.commit()
     await db.refresh(invoice)
@@ -294,7 +295,7 @@ async def reject_machinery_invoice(db: AsyncSession, invoice_id: uuid.UUID,
 
     invoice.status = "Rejected"
     invoice.rejection_reason = data.rejectionReason
-    invoice.reviewed_at = datetime.now(timezone.utc)
+    invoice.reviewed_at = datetime.now(IST)
     invoice.reviewed_by = reviewed_by
     await db.commit()
     await db.refresh(invoice)
